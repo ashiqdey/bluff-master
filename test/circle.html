@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+
+
+
+<style type="text/css">
+div{position:absolute;top:30px;left:30px;}
+
+
+	svg{height:50px}
+	svg circle{stroke-dasharray: 283,283; animation: timer_circle 10s linear}
+
+
+@keyframes timer_circle{
+	0%{stroke-dashoffset:283;}
+	50%{stroke-dashoffset:140;stroke:#1CEAA5}
+	100%{stroke-dashoffset:0;stroke:red}
+}
+</style>
+
+
+
+
+<div>
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle fill="none" stroke="#1CEAA5" stroke-width="6" cx="50" cy="50" r="45"/></svg>
+</div>
+
+
+
+
+
+</body>
+</html>

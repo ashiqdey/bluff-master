@@ -1,0 +1,14 @@
+<script>
+let g = {
+    player_card_count : {
+        '1' : 2,
+        '2' : 0,
+        '3' : 0,
+        '4' : 0,
+    }
+}
+
+    let players_with_cards = Object.keys(g.player_card_count).filter(e => g.player_card_count[e] > 0)
+console.log(players_with_cards);
+
+</script>

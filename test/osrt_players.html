@@ -1,0 +1,26 @@
+<script type="text/javascript">
+
+let t = {
+	players : [
+ 		'1','2','3','4'
+	]
+}
+
+//3
+// 3, 4,1,2
+let index = 0;
+
+
+let player_divided=[];
+player_divided.push(t.players[index]);
+
+console.log(player_divided);
+
+player_divided = player_divided.concat(t.players.slice(index+1))
+player_divided = player_divided.concat(t.players.slice(0,index))
+
+
+console.log(player_divided);
+
+
+</script>

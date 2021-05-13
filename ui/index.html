@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bluff Master</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+
+
+	<link rel="apple-touch-icon" sizes="57x57" href="img/logo/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="img/logo/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="img/logo/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="img/logo/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="img/logo/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="img/logo/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="img/logo/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="img/logo/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="img/logo/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="img/logo/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo/favicon-16x16.png">
+	<link rel="manifest" href="/manifest.json">
+	<meta name="msapplication-TileColor" content="#373E57">
+	<meta name="msapplication-TileImage" content="img/logo/ms-icon-144x144.png">
+	<meta name="theme-color" content="#373E57">
+
+</head>
+<body>
+
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+<script>
+
+let single_set = [
+	'a','a','a','a',
+	'j','j','j','j',
+	'q','q','q','q',
+	'k','k','k','k',
+	'2','2','2','2',
+	'3','3','3','3',
+	'4','4','4','4',
+	'5','5','5','5',
+	'6','6','6','6',
+	'7','7','7','7',
+	'8','8','8','8',
+	'9','9','9','9',
+	'10','10','10','10',
+]
+
+let card_available = [];
+
+let member_count = 4;
+let card_for_everyone = 13;
+let card_required = member_count * card_for_everyone;
+let set_requried = Math.ceil(card_required / 52);
+
+
+let card_for_user = [];
+
+
+//make a array of avaialble cards
+for(let i=0;i<set_requried;i++){
+	card_available = card_available.concat(single_set)
+}
+
+//make empty array for all members
+for(let i=0;i<member_count;i++){
+	card_for_user.push([])
+}
+
+
+//distribute 13 cards 
+for(let i=0;i<card_for_everyone;i++){
+
+	//for all members
+	for(let member=0;member<member_count;member++){
+
+		let random = getRandom(0,card_available.length-1)
+
+		console.log(`rand:${random}, avaialble:${card_available.length}, value:${card_available[random]}`);
+
+		card_for_user[member].push(card_available[random]);
+
+		
+		card_available.splice(random,1);
+
+	}
+
+}
+
+
+
+
+console.log('set_requried : ',set_requried);
+console.log('card_available : ',card_available);
+console.log('card_for_user : ',card_for_user);
+
+
+
+function getRandom(mn, mx) { 
+    return Math.round(Math.random() * (mx - mn) + mn); 
+}
+
+
+</script>

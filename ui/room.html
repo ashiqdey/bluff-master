@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Room - Bluff Master</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+
+
+	<link rel="apple-touch-icon" sizes="57x57" href="img/logo/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="img/logo/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="img/logo/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="img/logo/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="img/logo/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="img/logo/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="img/logo/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="img/logo/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="img/logo/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="img/logo/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo/favicon-16x16.png">
+	<link rel="manifest" href="/manifest.json">
+	<meta name="msapplication-TileColor" content="#373E57">
+	<meta name="msapplication-TileImage" content="img/logo/ms-icon-144x144.png">
+	<meta name="theme-color" content="#373E57">
+
+	<link rel="stylesheet" type="text/css" href="assets/home.css">
+
+</head>
+<body>
+
+
+<div class="p20 mw400 mcen">
+
+	<h2 class="f1 cgrey9 bold mt20">Recent rooms</h2>
+
+	<div class="whitebg br10 mt20">
+		<div class="p10">
+			<div class="flex jcsb aic p10">
+				<div class="w60 lc1">HYD-001</div>
+				<button class="but mbut theme ">Join room</button>
+			</div>
+
+			<div class="flex jcsb aic p10">
+				<div class="w60 lc1">HYD-001</div>
+				<button class="but mbut theme ">Join room</button>
+			</div>
+
+			<div class="flex jcsb aic p10">
+				<div class="w60 lc1">HYD-001</div>
+				<button class="but mbut theme ">Join room</button>
+			</div>
+		</div>
+
+		<hr>
+		<div class="p10 o6 f08 tc">SHOW ALL</div>
+	</div>
+
+
+	<div class="tab_holder mt50 mw400 mcen bsllg" id="tab_1" active="1">
+		
+		<div class="tab">
+			<div class="warp m2 w100 br8 tc" style="background:#2F3263">
+				<label class="ripple mr10 z5">
+					<input type="radio" name="tab_1" value="1" checked="">
+					<div class="text p10">Create room</div>
+				</label>
+				<label class="ripple mr10 z5">
+					<input type="radio" name="tab_1" value="2">
+					<div class="text p10">Join room</div>
+				</label>
+		
+				<div class="deco pa theme z0 br8 l0"></div>
+			</div>
+		</div>
+
+
+		<div class="tab_body ">
+			
+			<!--create room-->
+			<div class="warp">
+				<form id="form_email" class='mt50' processing='0'>
+					<div class="ninput">
+						<input type="text" name="room_id" placeholder='.' autocomplete="off">
+						<label>Room ID</label>
+					</div>
+					<div class="mt50">
+						<button class="but red fat w100">CREATE ROOM</button>
+						<div class="loader"></div>
+					</div>
+				</form>
+			</div>
+			<!--end create room-->
+
+
+			<div class="warp">
+				<form id="form_email" class='mt50' processing='0'>
+					<div class="ninput">
+						<input type="text" name="room_id" placeholder='.' autocomplete="off">
+						<label>Room ID</label>
+					</div>
+					<div class="mt50">
+						<button class="but aqua fat w100">JOIN ROOM</button>
+						<div class="loader"></div>
+					</div>
+				</form>
+			</div>
+
+		</div>
+	</div>
+
+
+
+
+</div>
+
+
+<div id="notif_holder"></div>
+
+
+
+<script src="assets/vendor/jquery.min.js"></script>
+<script src="assets/common.js"></script>
+
+
+</body>
+</html>
+
+
+

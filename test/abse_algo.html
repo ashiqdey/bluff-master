@@ -1,0 +1,77 @@
+<script type="text/javascript">
+
+
+let single_set = [
+	'a','a','a','a',
+	'j','j','j','j',
+	'q','q','q','q',
+	'k','k','k','k',
+	'2','2','2','2',
+	'3','3','3','3',
+	'4','4','4','4',
+	'5','5','5','5',
+	'6','6','6','6',
+	'7','7','7','7',
+	'8','8','8','8',
+	'9','9','9','9',
+	'10','10','10','10',
+]
+
+let card_available = [];
+
+let member_count = 4;
+let card_for_everyone = 13;
+let card_required = member_count * card_for_everyone;
+let set_requried = Math.ceil(card_required / 52);
+
+
+let card_for_user = [];
+
+
+//make a array of avaialble cards
+for(let i=0;i<set_requried;i++){
+	card_available = card_available.concat(single_set)
+}
+
+//make empty array for all members
+for(let i=0;i<member_count;i++){
+	card_for_user.push([])
+}
+
+
+//distribute 13 cards 
+for(let i=0;i<card_for_everyone;i++){
+
+	//for all members
+	for(let member=0;member<member_count;member++){
+
+		let random = getRandom(0,card_available.length-1)
+
+		console.log(`rand:${random}, avaialble:${card_available.length}, value:${card_available[random]}`);
+
+		card_for_user[member].push(card_available[random]);
+
+		
+		card_available.splice(random,1);
+
+	}
+
+}
+
+
+function getRandom(mn, mx) { 
+    return Math.round(Math.random() * (mx - mn) + mn); 
+}
+
+console.log('set_requried : ',set_requried);
+console.log('card_available : ',card_available);
+console.log('card_for_user : ',card_for_user);
+
+
+
+console.log('card_for_user : ',card_for_user[0]);
+card_for_user[0].sort();
+console.log('card_for_user : ',card_for_user[0]);
+
+
+</script>

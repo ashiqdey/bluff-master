@@ -1,0 +1,27 @@
+<script type="text/javascript">
+
+let rooms = [
+	{id:11,n:'room 11'},
+	{id:12,n:'room 12'},
+	{id:13,n:'room 13'},
+	{id:14,n:'room 14'},
+];
+
+let room = {id:13,n:'room 13'};
+
+console.log(rooms);
+
+
+
+
+rooms = rooms.filter((e)=>{
+  return e.id!=room.id;
+})
+
+console.log(JSON.stringify(rooms));
+rooms.unshift(room);
+
+console.log(rooms);
+
+
+</script>

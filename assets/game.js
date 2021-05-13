@@ -7,7 +7,7 @@ class Game{
     this.players_subscribed=[];
     
 
-    this.turn_time=15;//15 sec
+    this.turn_time=20;//15 sec
 
     this.next_call_delay = 2;//allow 2 sec delay to start the next turn
 
@@ -409,6 +409,8 @@ class Game{
 
     if(fresh_turn){
 
+      g.turn_call=0;
+      
       g.old_cards_on_table = [];
       g.latest_cards_on_table = [];
       g.total_cards_on_table = 0;
@@ -627,6 +629,9 @@ class Game{
     payload.cards_have = g.my_cards.length
 
     
+    log(g.turn_call);
+    log(my_call_is);
+
     //send message to all, saying my playing details
     mqtt.send(mqtt.game_topic,{game : {cards_played : payload}})
 
@@ -937,7 +942,7 @@ class Game{
     g.clear_next_timer();
     g.stop_bluff_timer();
     g.stop_pass_timer();
-
+    g.card_window(0);
     
 
     //this is the victim (not won)
@@ -1052,6 +1057,9 @@ class Game{
 
     $('.round_no').text(round);
     $('#start_round').show();
+    $('#cards_chooseable .wrap').html('');
+
+    g.card_window(0);
   }
 
 

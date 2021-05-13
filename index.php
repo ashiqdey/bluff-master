@@ -65,7 +65,7 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 #card_window .progress>div{height:3px;background:#25E979;}
 
 #card_window[show='1']{height:345px;background:#373E57;z-index:4;}
-#card_window[show='1'] .progress>div{display:block;width:100%;animation:width100 15s}
+#card_window[show='1'] .progress>div{display:block;width:100%;animation:width100 20s}
 #card_window[show='1'] .form_self_turn{display:block;}
 #card_window[show='1'] .card{width:35px}
 
@@ -89,7 +89,7 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 #players .player:before{content:attr(count);background:#fff;height:28px;width:28px;border-radius:40px;position:absolute;top:-8px;right:-9px;display:flex;align-items:center;justify-content:center;font-size:0.8em;border:2px solid var(--darkbg);color:var(--darkbg);font-weight:500;z-index:2;}
 
 #players svg circle{stroke-dasharray:295,295;stroke-dashoffset:295;opacity:0;}
-#players .player[active='1'] svg circle{stroke-dashoffset:0;stroke:red;animation: timer_circle 10s linear;opacity:1;}
+#players .player[active='1'] svg circle{stroke-dashoffset:0;stroke:red;animation: timer_circle 20s linear;opacity:1;}
 
 
 @keyframes timer_circle{

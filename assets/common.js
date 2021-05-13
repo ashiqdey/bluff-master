@@ -52,7 +52,7 @@ $(function(){
 
 
 
-      if(window.location.hash==''){
+      if(window.location.hash!='#room'){
         window.location.hash = '#room';
       }
 
@@ -100,8 +100,7 @@ function getRandom(mn, mx) {
 
 function make_notif(){
 	$('#notif_holder').html(`<div id="notif" onclick="$('#notif').attr('show','0')" class="flex aic jcsb">
-		<div id="notif_mgs" class="lc3"></div>
-		<div class="f26 close cp cgreyd lh0 ic br50 ic50">&times;</div>
+
 	</div>`);
 }
 function loader(){
@@ -173,8 +172,7 @@ $(document).on("click",".ca",function(){$($(this).attr("sel")).attr($(this).attr
 
 /*notification timer*/
 function notif(t){
-  $("#notif").attr("show","1");
-  $("#notif_mgs").text(t);
+  $("#notif").attr("show","1").text(t)
 
   if(t.notif_timer){
     clearInterval(t.notif_timer)
@@ -209,6 +207,7 @@ function notif(t){
 ------------------------*/
 const popup_hash = [
     '#room',
+    '#scorecard'
   ]
 
 
@@ -227,11 +226,6 @@ $(document).on("click","a", function(e){
   let url = $(this).attr("href");
     
 
-    return;
-
-
-
-  //detect hash
   if(url.indexOf('#')==0){
     e.preventDefault();
 
@@ -239,8 +233,6 @@ $(document).on("click","a", function(e){
     window.location.hash=url;
 
     if(popup_hash.includes(url)){
-
-
       show(url,1);
       delete t.forward;
     }
@@ -274,38 +266,31 @@ function forward_hash(h){
 }
 
 
-function on_hashchanged(new_hash,old_hash,hash=''){
-
-  log("on_hashchanged");
-  log(old_hash);
-  log(new_hash);
 
 
-  if(t.custom){
-    log('custom');
+function on_hashchanged(new_hash,old_hash){
 
+  //new_hash = new_hash.split('#')[1];
+  old_hash = "#"+old_hash.split('#')[1];
+  
+  
+  if(t.forward){
+    delete t.forward;
   }
-  else{
-    if(t.forward){
-      log('forward');
-      delete t.forward;
+
+  //back
+  else if(old_hash != undefined){
+
+    if(popup_hash.includes(old_hash)){
+      show(old_hash,0);
     }
-    else{
-      log('backward');
-    }
-
-    hash = "#"+new_hash.split('#')[1];
+    
   }
 
-
-
-  log(hash);
-
-
-  if(popup_hash.includes(hash)){
-    show(hash,0);
-  }
 }
+
+
+
 
 
 
@@ -318,7 +303,18 @@ function show(ele,type){
     }
     room.render_room_ui();
   }
+  else{
+    if(ele=='#scorecard' && g){
+      g.render_scorecard()
+    }
 
+
+    $(ele).attr("show",type);
+
+  }
+
+
+  
 
 }
 

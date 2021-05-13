@@ -42,7 +42,7 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 #table .border{height:calc(100% - 20px);width:calc(100% - 20px);top:10px;left:10px;border-radius:20px;}
 #table .border_bg{background-image:linear-gradient(30deg,#c2ae81 21%,#5b4d2e 50%,#ebd7a8);height:150%;width:150%;top:-25%;left:-25%;}
 #table .border_bg[animate='1']{animation:rotate180 18s infinite linear}
-#table .carpet{background-image:radial-gradient(#3C44A3,#1F2561);height:calc(100% - 20px);width:calc(100% - 20px);top:10px;left:10px;border-radius:12px;}
+#table .carpet{background-image:radial-gradient(#30459f,#12153a);height:calc(100% - 20px);width:calc(100% - 20px);top:10px;left:10px;border-radius:12px;}
 
 #oldcards{position:absolute;top:20px;left:20px;}
 #oldcards .card{width:15px;}

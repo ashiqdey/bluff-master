@@ -4,13 +4,11 @@ class Game{
 
     this.winners={};
     
-    this.players_subscribed=[];
-    
 
     this.turn_time=15;//15 sec
 
     this.next_call_delay = 2;//allow 2 sec delay to start the next turn
-
+    this.total_cards_on_table=0
 
     //round will start when clicked this button
     $(document).on('click','#start_round',function(){
@@ -55,7 +53,7 @@ class Game{
   render_game(){
 
     g.my_cards=[];
-    g.cards_with_players={};
+    g.player_card_count={};
 
 
     $('#app').html(`
@@ -64,6 +62,7 @@ class Game{
         <div class="ribbon flex aic jcsb p10 pr">
           
           <div class="flex aic">
+            <img src="icon/king.svg" class="ic25">
             <span class="f12 bold ml10">Round - <span class='round_no'></span></span>
           </div>
           <!--div class="flex aic">
@@ -71,13 +70,6 @@ class Game{
             <div class="ic40 ic p5 ml10"><img src="icon/chat.svg" class=""></div>
             <div class="ic40 ic p5 ml10"><img src="icon/3dot.svg" class=""></div>
           </div-->
-
-
-
-          <div class="flex aic">
-            <a href="#scorecard" class="ic40 ic p5" id='open_scorecard'><img src="icon/king.svg" class="dn"></a>
-          </div>
-
 
 
           <div id='chat_received' class='pf z5 black cgrey7 f08 br10'>sfd</div>
@@ -91,7 +83,7 @@ class Game{
             <div class="carpet pa p10">
 
               <div class='pa h100 w100'>
-                <duv class='pa w100 tc t50 l50 tt-50 z5'><button id='start_round' class='but fat theme dn'>TAP TO START</button></div>
+                <duv class='pa w100 tc t50 l50 tt-50 z5'><button id='start_round' class='but fat theme'>TAP TO START</button></div>
 
 
                 <div id="oldcards" class="flex"></div>
@@ -148,10 +140,9 @@ class Game{
 
 
 
-
-        <div id='scorecard' class='overlay pf t0 w100 h100 l0 z4000' show='0'>
-        <div class='mask back mt'></div>
-        <div class='mask click_back sw'></div>
+        
+        <div id='scorecard' class='overlay pf t0 w100 h100 l0 z4000 ' show='1'>
+        <div class='mask'></div>
         <div class="darkbg p15 wrap mw400 mcen">
           <div class="flex jcfe p10 o6 f07 tc">
             <div class="w130p">LAST 5</div>
@@ -169,8 +160,7 @@ class Game{
       g.render_players()
       
       if(t.host){
-
-        //check every 300ms if all user conected or not
+                //check every 300ms if all user conected or not
         g.timer_subscriber = setInterval(() => {
           if(g.players_subscribed.length >= g.players.length){
 
@@ -184,9 +174,10 @@ class Game{
           }
         }, 300);
 
-
         g.init_round();
+        
       }
+
       
 
 
@@ -207,48 +198,6 @@ class Game{
 
   }
 
-
-
-
-
-  
-  render_scorecard(){
-    //after every round emit score card
-    /*
-
-    {
-      12 : [
-        score,
-        history
-      ],
-      12 : [
-        5,
-        [2,3,4]
-      ]
-    }
-    */
-    
-    $("#scorecard .list").html(Object.keys(g.scorecard).map(make).join(''));
-    
-
-    function make(e){
-
-      let player = g.get_player
-      let last5 = e[1].map(e=>`<span class='score_dot' score='1'></span>`).join('')
-
-      return `<div class="p5 flex jcsb aic">
-        <div class="flex aic w50">
-          <div class="ic35 greyd br50 bsc" style="background-image:url(img/dp/${player.id}.jpg)"></div>
-          <div class="lc1 cgrey5 ml10 w-50">${player.name}</div>
-        </div>
-        <div class="w50 flex">
-          <div class="last_5 flex w-50">${last5}</div>
-          <div class="tc w50p">${e[0]}</div>
-        </div>
-      </div>`
-    }
-    
-  }
 
 
 
@@ -287,7 +236,7 @@ class Game{
 
 
 
-  
+
 
 
   cards_received(m){
@@ -295,7 +244,10 @@ class Game{
 
     if(m.initial){
       g.my_cards = m.cards_received;
-    
+
+      $('#start_round').show();
+
+      
     }
     else{
       g.my_cards = g.my_cards.concat(m.cards_received);
@@ -355,11 +307,11 @@ class Game{
 
 
 
-  
+
   render_card_count(m){
     //loop all user and add card count (k:v)
     Object.keys(m).map(e=>{
-      g.cards_with_players[e] = m[e];
+      g.player_card_count[e] = m[e];
       $(`.player[player-id='${e}']`).attr('count',m[e]);
     });
   }
@@ -395,11 +347,8 @@ class Game{
 
   
   render_current_turn(player_id,fresh_turn=0){
-    log('----------start render-current-turn----------');
-    log(`player_id : ${player_id}`);
-    log(`fresh_turn : ${fresh_turn}`);
-
-
+    log('----------start render-fresh-turn----------');
+    
     g.turn_of_id = player_id;
 
 
@@ -408,33 +357,31 @@ class Game{
 
 
     if(fresh_turn){
-
       g.old_cards_on_table = [];
       g.latest_cards_on_table = [];
-      g.total_cards_on_table = 0;
-      g.empty_table();
 
       //when fresh turn starts, empty all passed members
       g.passed_players = [];
 
+      //empty the table
+      g.total_cards_on_table = [];
+
+      g.empty_table();
     }
     
-    //stop all timer
-    g.stop_pass_timer()
 
 
     //if this is target player then opne card window
     if(player_id == t.details.id){
-      alert('my turn')
+
 
       //check if this user already passed in this turn, then pass
       //or this user have no cards
       if(
-        g.passed_players.includes(t.details.id) ||
-        g.winners.includes(t.details.id) ||
+        g.turn_passed.includes(t.details.id) ||
         g.my_cards.length==0
       ){
-        log("i m passing - 433");
+        log("i m passing - 363");
         //0 = dont display chat text, because its auto pass
         g.i_pass(0)
         return;
@@ -446,19 +393,30 @@ class Game{
 
 
         /*------disable, enable call selector-----*/
-        $("#card_no_chooser input[name='call']").prop('disabled',(fresh_turn ? false:true))
-        if(fresh_turn){
-          $(`#card_no_chooser input[name='call']:checked`).prop('checked',false)
-        }
-        else{
+        //if turn_call is valid then disable it lese, allow to choose his own call
+        $("#card_no_chooser input[name='call']").prop('disabled',(g.turn_call ? true:false))
+        
+        //select the turn call  button, when turn call is passed
+        if(g.turn_call){
           $(`#card_no_chooser input[name='call'][value='${g.turn_call}']`).prop('checked',true)
+        }
+        //else remove the select button
+        else{
+          $(`#card_no_chooser input[name='call']:checked`).prop('checked',false)
         }
         /*------disable, enable call selector-----*/
 
 
+
         //close exising timer
+        if(g.timer_waiting_to_pass){
+          clearTimeout(g.timer_waiting_to_pass)
+        }
+        //allow 10 sec to put cards
         g.timer_waiting_to_pass = setTimeout(g.i_pass,(g.turn_time * 1000));
+      
       }
+
       
     }
     else{
@@ -468,10 +426,102 @@ class Game{
 
 
 
-    log('----------end render-current-turn----------');
+
+
+
+    log('----------end render-fresh-turn----------');
   }
 
 
+
+
+
+  /*
+  admin will call this function 
+  current playing player's info will be passed, alter UI accordingly
+  */
+ /*
+  render_current_player(m){
+    log('----------start render_current_player----------');
+    log(m)
+
+    g.turn_call = m.turn_call;
+    g.current_player = m.whose_turn;
+
+
+
+
+    //make all players inactive
+    $(`#players .player`).attr('active','0')
+    
+    if(m.fresh_turn){
+      //when fresh turn starts, empty all passed members
+      g.turn_passed=[]
+
+      //empty the table
+      g.total_cards_on_table = [];
+      $('#cards_on_table_count').text(0)
+
+      $(`#users_call`).text('')
+    }
+    
+
+
+
+
+
+    //if this is target player then opne card window
+    if(m.whose_turn == t.details.id){
+
+
+      //check if this user already passed in this turn, then pass
+      //or this user have no cards
+      if(
+        g.turn_passed.includes(t.details.id) ||
+        g.my_cards.length==0
+      ){
+        log("i m passing - 542");
+        //0 = dont display chat text
+        g.i_pass(0)
+        return;
+      }
+      else{
+        g.card_window(1)
+
+
+        //------disable, enable call selector-----
+        //if turn_call is valid then disable it lese, allow to choose his own call
+        $("#card_no_chooser input[name='call']").prop('disabled',(g.turn_call ? true:false))
+        
+        //select the turn call  button
+        if(g.turn_call){
+          $(`#card_no_chooser input[name='call'][value='${g.turn_call}']`).prop('checked',true)
+        }
+
+
+
+        //close exising timer
+        g.stop_pass_timer();
+
+        //allow 10 sec to put cards
+        g.timer_waiting_to_pass = setTimeout(g.i_pass,(g.turn_time * 1000));
+      }
+
+      
+
+      
+    }
+    else{
+      //show animation if player if my opponent
+      $(`#players .player[player-id='${m.whose_turn}']`).attr('active','1')
+    }
+
+
+    log('----------end render_current_player----------');
+
+
+  }
+*/
 
 
 
@@ -523,11 +573,6 @@ class Game{
     }
 
 
-
-    log("----PASSED");
-    log(g.passed_players);
-
-
     if(t.host){
       log('---- passed -- I AM HOST');
       g.clear_next_timer();
@@ -552,7 +597,7 @@ class Game{
     //when put button will be clicked this function will be called
 
     //stop the pass time timeout, else i_pass() will be called
-    g.stop_pass_timer();
+    g.stop_pass_timer()
 
 
     //get select cards
@@ -678,28 +723,22 @@ class Game{
 
 
     //merge both old and new cards on table
-    g.old_cards_on_table    = g.old_cards_on_table.concat(g.latest_cards_on_table);
-    g.render_old_cards();
+    g.old_cards_on_table = g.old_cards_on_table.concat(g.latest_cards_on_table);
 
+    //hold the lastes cards on table
     g.latest_cards_on_table = m.cards;
-    g.render_lastet_card();
-
-    g.total_cards_on_table  = g.old_cards_on_table.length + g.latest_cards_on_table.length;
-    $("#cards_on_table_count").html(g.total_cards_on_table);
-
-
-
 
     g.last_played_id    = m.pid;
-    g.last_played_index = g.get_player_index(m.pid);
-
     g.cards_have        = m.cards_have;
+    g.cards             = m.cards;
+    g.last_played_index = g.get_player_index(m.pid);
     let player          = g.players[g.last_played_index];
 
 
 
     if(m.turn_started){
       g.turn_call = m.turn_call;
+
       g.turn_started_by_index = g.last_played_index;
     }
 
@@ -730,7 +769,7 @@ class Game{
     $('#cards_on_table_count').text(g.old_cards_on_table.length + g.latest_cards_on_table.length);
 
     //render the lastest card on table
-    g.render_lastet_card();
+    g.render_lastet_card_on_table();
 
     //show user profile
     $('#user_played').html(`<div class="dp ic50 b3sf br30 greyd bsc" style="background-image:url(img/dp/${player.id}.jpg)"></div><div class="name pa white cgrey7 br20 p5 lc1 f08 bold">${player.name}</div>`);
@@ -774,23 +813,14 @@ class Game{
 
     g.winners.push(pid);
 
-    score = g.players.length - Object.keys(g.winners).length;
-    let rank = g.winners.length;
-
-
-
+    score = g.players.length - Object.keys(g.score_card).length;
     log(`NEW winner iD:${pid}, score : ${score}`);
 
-    if(g.scorecard[id]){
-      g.scorecard[id][0] = score;
-      g.scorecard[id][1].push(rank)
-
-      if(g.scorecard[id][1].length > 5){
-        g.scorecard[id][1].splice(0,(g.scorecard[id][1].length - 5))
-      }
+    if(g.score_card[id]){
+      g.score_card[id].push(score)
     }
     else{
-      g.scorecard[id] = [score,[rank]]
+      g.score_card[id] = [score]
     }
   }
 
@@ -800,7 +830,7 @@ class Game{
   /*
   render the latest cards on table
   */
-  render_lastet_card(){
+  render_lastet_card_on_table(){
     $('#latest_card').html(g.latest_cards_on_table.map(make_cards).join(''));
     function make_cards(e){
       return `<div class="card">
@@ -830,37 +860,32 @@ class Game{
 
     g.stop_bluff_timer();
 
+    log(g.old_cards_on_table);
 
-    //this will be called after (10 - 2) sec from the time of card playing
+    //this will be called after 910 - 2) sec from the time of card playing
 
     //hide bluff button
     $("#bluff").hide();
 
+    g.old_cards_on_table = g.old_cards_on_table.concat(g.latest_cards_on_table);
 
+    //take lastet cards to  old
+    g.add_last_cards_to_old();
 
-    g.old_cards_on_table    = g.old_cards_on_table.concat(g.latest_cards_on_table);
-    g.render_old_cards();
+    //clean table, add last cards to old cards
+    let c='';
+    let max = (g.old_cards_on_table.length > 12 ? 12 : g.old_cards_on_table.length)
+    for(let ic=0;ic<max;ic++){
+      c += '<div class="card"><div class="img_holder pr"><img src="img/card.webp" class="w100 br6"></div></div>';
+    }
+    $("#oldcards").html(c);
+    $("#cards_on_table_count").html(g.old_cards_on_table.length);
 
-    g.latest_cards_on_table=[];
-    
-  
     //remove lastest cards
     $('#latest_card').html('');
   }
 
 
-
-
-
-  render_old_cards(){
-    //clean table, add last cards to old cards
-    let c='';
-    let max = (g.total_cards_on_table > 12 ? 12 : g.total_cards_on_table)
-    for(let ic=0;ic<max;ic++){
-      c += '<div class="card"><div class="img_holder pr"><img src="img/card.webp" class="w100 br6"></div></div>';
-    }
-    $("#oldcards").html(c);
-  }
 
 
 
@@ -872,29 +897,20 @@ class Game{
     //check whether false bluff or correct
     let bluffed=0;
 
-    g.latest_cards_on_table.map(e=>{
+    g.cards.map(e=>{
       if(e != g.turn_call){
         bluffed=1;
       }
     });
 
-
-    
-
  
     //if bluff failed, accecpt the cards
     if(!bluffed){
-
-      g.old_cards_on_table = g.old_cards_on_table.concat(g.latest_cards_on_table);
-      
-
-      //if cards window is open close it, stop timer
-      g.card_window(0)
-      g.stop_pass_timer()
+      g.my_cards = g.my_cards.concat(g.lastest_cards_on_table);
+      g.render_my_cards();
     }
 
-    g.latest_cards_on_table=[];
-    g.empty_table();
+    
 
 
     log(`won by: bluffed:${bluffed} , `+(bluffed ? t.details.id : g.last_played_id));
@@ -905,14 +921,11 @@ class Game{
         bluff:{
           bluffed_by : t.details.id,
           bluffed_to : g.last_played_id,
-          cards : g.old_cards_on_table,
+          cards : g.total_cards_on_table,
           won : (bluffed ? t.details.id : g.last_played_id)
         }
       }
     })
-
-
-
 
   }
 
@@ -926,59 +939,19 @@ class Game{
 
     let by = g.players.find(e=>e.id==m.bluffed_by)
     let to = g.players.find(e=>e.id==m.bluffed_to)
-    let looser = (m.won == m.bluffed_by) ? m.bluffed_to : m.bluffed_by;
-
 
     if(by && to){
-      notif(`${by.name} bluffed ${(m.won==by.id?'':' - wrong guess')}`);
+      notif(`${by.name} bluffed ${to.name} - ${(m.won==by.id?'perfect guess':'wrong guess')}`);
     }
 
 
     g.clear_next_timer();
     g.stop_bluff_timer();
-    g.stop_pass_timer();
-
-    
-
-    //this is the victim (not won)
-    if(to.id == t.details.id && m.won!=t.details.id){
-      log(`TO : ${to.id} CARDS:${m.cards.length}`);
-      log(m.cards);
-
-        g.cards_received({cards_received:m.cards})
-    }
-    //bluffed by
-    else if(by.id==t.details.id && m.won!=t.details.id){
-      log(`BY : ${by.id} CARDS:${m.cards.length}`);
-      log(m.cards);
-
-      g.cards_received({cards_received:m.cards})
-    }
-    else{
-      log(`BY : ${by.id} CARDS:${m.cards.length}`);
 
 
-
-      g.cards_with_players[looser] += m.cards.length
-      
-
-      log(`cards counter for looser, user=${looser} : `+g.cards_with_players[looser]);
-    }
-
-
-    //render the cards with loosed
-    g.render_card_count({[looser] : g.cards_with_players[looser]})
-
-
-
-
-
-    
-    
     //empty the table, and adjust table
     g.old_cards_on_table = [];
-    g.latest_cards_on_table = [];
-    g.total_cards_on_table = 0;
+    g.lastest_cards_on_table = [];
     g.empty_table();
 
 
@@ -987,8 +960,21 @@ class Game{
     $(`#players .player`).attr('active','0');
     
 
+    //this is the victim (not won)
+    if(to.id == t.details.id && m.won!=t.details.id){
+        //accept all cards
+        g.my_cards = g.my_cards.concat(m.cards);
+        g.render_my_cards();
+    }
 
-   
+
+    //alter card counter
+    let looser = (m.won == by.id) ? to.id : by.id;
+
+    g.player_card_count[looser] += m.cards.length
+    g.render_card_count({[looser] : g.player_card_count[looser]})
+
+    log(`cards counter for looser, user=${looser} : `+g.player_card_count[looser]);
 
 
 
@@ -1000,6 +986,7 @@ class Game{
       log('---- bluffed -- I AM HOST');
 
       g.clear_next_timer();
+      //automatically call for fresh turn after 3 sec
       g.next_call_timer = setTimeout(g.start_fresh_turn, (3 * 1000));
 
       //who ever won will start the next turn
@@ -1046,31 +1033,30 @@ class Game{
 
 
 
-  render_new_round(round){
-    g.round = round;
-    g.winners = []
+  render_new_round(m){
+    $('.round_no').text(m);
 
-    $('.round_no').text(round);
-    $('#start_round').show();
+    //clear table
   }
 
 
 
   messageArrived(m){
     
-
-
-    if(m.i_subscribed){
-      log(m);
-
+      if(m.i_subscribed){
       //some user subscribed game topic
       if(!g.players_subscribed.includes(m.i_subscribed)){
         g.players_subscribed.push(m.i_subscribed)
       }
     }
-    else if(m.new_round){
-      
 
+    //card received (from distrubution/ table)
+    else if(m.cards_received && m.player_id==t.details.id){
+      g.cards_received(m);
+    }
+
+
+    if(m.new_round){
       //m.new_round = round no.
       g.render_new_round(m.new_round);
     }
@@ -1080,17 +1066,13 @@ class Game{
 
 
     else if(m.fresh_turn){
-      log(m);
-
       //m.fresh_turn = id of player who will start the turn
-      g.render_current_turn(m.fresh_turn,1)
+      g.render_current_turn(m,1)
     }
 
     else if(m.next_turn){
-      log(m);
-
       //next_turn : g.turn_of_id,
-      g.render_current_turn(m.next_turn,0)
+      g.render_current_turn(m,0)
     }
 
     //card received (from distrubution/ table)
@@ -1117,15 +1099,6 @@ class Game{
     else if(m.round_over){
       g.round_over(m.round_over);
     }
-
-    else if(m.scorecard){
-      g.scorecard_received(m);
-    }
-
-
-    
-
-
     else{
       log('--- Game mqtt');
       log(m);
@@ -1146,10 +1119,7 @@ class Game{
 
 
 
-  scorecard_received(m){
-    log(m);
-    //open_scorecard
-  }
+
 
 
 
@@ -1158,16 +1128,10 @@ class Game{
   
   init_round(){
     log('--------------------init_round------------------------');
-
-    if(g.all_players_connected){
-      g.distribute_card();
-    }
-
-    
-
+    setTimeout(g.distribute_card,500)
 
     g.winners             = []
-    g.scorecard          = {}
+    g.score_card          = {}
     g.round               = (!g.round) ? 1 : (g.round+1);
     g.players_ready       = 0;
     g.cards_with_players = {}
@@ -1190,7 +1154,7 @@ class Game{
 
       if(g.players_ready >= g.players.length){
         console.log("everybody is ready, make first turn");
-        setTimeout(g.start_fresh_turn,2000)
+        g.start_turn();
       }
     }
   }
@@ -1200,24 +1164,17 @@ class Game{
 
 
   get_next_player_index(p){
-    log('-----get_next_player_index');
-    log('past : '+p);
-
     p++;
-    p = (p >= g.players.length)?0:p;
-
-    log('past : '+p);
-
-    return p;
+    return (p >= g.players.length)?0:p;
   }
 
 
   get_player_id(index){
-    return g.players[index].id;
+    return g.player[index].id;
   }
 
   get_player_index(id){
-    return g.players.findIndex(e=>e.id==id)
+    return g.player.findIndex(e=>e.id==id)
   }
 
 
@@ -1227,7 +1184,7 @@ class Game{
 
 
      //check how many player have cards with them
-     let players_with_cards = Object.keys(g.cards_with_players).filter(e => g.cards_with_players[e] > 0)
+     let players_with_cards = Object.keys(g.player_card_count).filter(e => g.player_card_count[e] > 0)
 
      //only 1 player is having cards
      if(players_with_cards.length == 1){
@@ -1262,42 +1219,26 @@ class Game{
     let loop=0;
 
     while(!allowed_to_start_turn){
-      log(`-----while`);
 
       //looped for all user, no one is allowed to play cards, so start fresh round
       if(loop >= g.players.length){
-        log(`1206 - loop ${loop}, players:${g.players.length},  `);
-
         g.init_round();
         allowed_to_start_turn=1;
         return;
       }
 
 
-      
-
-
       //who will start the turn
       if(!g.hasOwnProperty(g.turn_started_by_index)){
-        log('128 if TURN STARTED: '+g.turn_started_by_index);
-
-        g.turn_started_by_index = getRandom(0,(g.players.length-1));
+        g.turn_started_by_index = getRandom(0,g.players.length-1);
       }
       else{
-        log('128 else TURN STARTED: '+g.turn_started_by_index);
-
         g.turn_started_by_index = g.get_next_player_index(g.turn_started_by_index)
       }
-
-      log('1286 TURN STARTED:'+g.turn_started_by_index);
-
 
 
       //fresh turn so turn will be started by g.turn_started_by
       g.turn_of_id = g.get_player_id(g.turn_started_by_index)
-
-      log(g.cards_with_players);
-
 
 
       //if the player have cards to play, the allo w him to start turn
@@ -1305,7 +1246,6 @@ class Game{
         allowed_to_start_turn = 1;
       }
 
-      log(`LOOP ${loop}, TURN-WILL-START-BY:${g.turn_started_by_index}, TURN-id:${g.turn_of_id}, ALLOWED:${allowed_to_start_turn}`);
 
       loop++;
     }
@@ -1350,15 +1290,15 @@ class Game{
       g.new_winner(m.pid)
     }
 
-    //no longer requried
-    delete g.cards_have;
+      //no longer requried
+      delete g.cards_have;
 
 
-    //if all user passed, then start new turn
-    if((g.winners.length + g.passed_players.length) >= g.players){
-      log('all completed, now start new turn');
-      g.start_fresh_turn();
-    }
+      //if all user passed, then start new turn
+      if((g.winners.length + g.passed_players.length) >= g.players){
+        log('all completed, now start new turn');
+        g.start_fresh_turn();
+      }
 
 
 
@@ -1367,10 +1307,10 @@ class Game{
     let loop=0;
 
     while(!allowed_to_start_turn){
-      log("------WHILE");
-      //looped for all user, no one is allowed to play cards, so start fresh turn
+
+      //looped for all user, no one is allowed to play cards, so start fresh round
       if(loop >= g.players.length){
-        g.start_fresh_turn();
+        g.init_round();
         allowed_to_start_turn=1;
         return;
       }
@@ -1382,11 +1322,6 @@ class Game{
 
       g.turn_of_id = g.get_player_id(g.last_played_index)
 
-  
-      log(g.passed_players);
-      log(g.cards_with_players[g.turn_of_id]);
-      log(g.turn_of_id);
-
 
       //if the player have cards to play, 
       //&& he haven't pass yet, the allow him to start turn
@@ -1394,9 +1329,6 @@ class Game{
         allowed_to_start_turn = 1;
       }
   
-
-      log(`LOOP ${loop}, LAST-PLAYED-BY:${g.last_played_index}, TURN-id:${g.turn_of_id}, ALLOWED:${allowed_to_start_turn}`);
-
 
       loop++;
     }
@@ -1406,6 +1338,7 @@ class Game{
     mqtt.send(mqtt.game_topic,{
       game:{
         next_turn : g.turn_of_id,
+        turn_call : g.turn_call
       }
     });
 
@@ -1418,6 +1351,156 @@ class Game{
 
 
 
+
+
+/*
+  start_turn(fresh_turn=1){
+    log('--------start of start-turn-------');
+    log('g.whose_turn : '+g.whose_turn);
+    log('fresh_turn : '+fresh_turn);
+    
+
+    //check if more than 2 user is remaining
+    if((g.completed_players.length + 1) == g.players.length){
+      mqtt.send(mqtt.game_topic,{game:{round_over:g.round}})
+      setTimeout(g.init_round,2000)
+      return
+    }
+
+
+    //fresh turn
+    if(fresh_turn){
+      //hold passed members id
+      g.turn_passed = []
+
+      //set turn call as 0, so that user can select his call
+      g.turn_call = 0;
+
+      //select the next player to start this turn
+      if(g.hasOwnProperty('turn_started_by')){
+        let index = g.players.findIndex(e=>e.id==g.turn_started_by);
+        g.whose_turn = (index + 1)
+      }
+      else if(g.hasOwnProperty('turn_will_start_by')){
+        g.whose_turn = g.players.findIndex(e=>e.id==g.turn_will_start_by)
+        delete g.turn_will_start_by;
+      }
+      else{
+        g.whose_turn=0
+      }
+      
+    }
+    //fresh turn
+
+
+
+    //old turn
+    else{
+
+      if(!g.last_played){
+        g.whose_turn=0;
+      }
+
+      log(g.last_played);
+
+      //get the id and position of last player, then set the player to next player
+      let index = g.players.findIndex(e=>e.id==g.last_played);
+      g.whose_turn = (index + 1)
+
+      if(g.whose_turn >= g.players.length ){
+        g.whose_turn = 0;
+      }
+
+      //check if user is already passed, then dont allow him
+      let c=true;
+      let player_id;
+      let loop_count=0;
+      let turn_over=0;
+
+      log('in  of loop'+202);
+      log('g.whose_turn '+g.whose_turn);
+      log(g.turn_passed);
+
+      while(c){
+
+        //if all members passsed then, start new turn
+        if(loop_count >= g.players.length){
+          c=false;
+          turn_over=1;
+        }
+
+        
+
+        //get the player id
+        //check if user had passed already in this turn, then allot the next user
+        //check if user is competed, dont allo to complete users
+        if(
+          g.turn_passed.includes(g.players[g.whose_turn].id) || 
+          g.completed_players.includes(g.players[g.whose_turn].id)
+        ){
+          g.whose_turn++;
+        }
+        else{
+          c=false;
+        }
+
+        
+        //if index crossed max length, set it to 0
+        if(g.whose_turn >= g.players.length ){
+          g.whose_turn = 0;
+        }
+
+        loop_count++;
+      }
+
+      log('out of loop loop_count:'+loop_count);
+      log('g.whose_turn '+g.whose_turn);
+  
+
+
+      //this turn is over so start next fresh turn
+      if(turn_over){
+        g.start_turn();
+        return;
+      }
+
+
+    }
+    //old turn
+
+    
+
+
+
+
+    //at end of array, reset to user at index 0
+    if(g.whose_turn>= g.players.length ){
+      g.whose_turn = 0;
+    }
+
+    log('831');
+    log(g.whose_turn);
+    log(g.players[g.whose_turn].id);
+
+    let payload = {
+      whose_turn:g.players[g.whose_turn].id,
+      turn_call : g.turn_call
+    };
+
+    if(fresh_turn){
+      payload.fresh_turn=1
+    }
+
+    log(payload);
+    log('--------end of start-turn-------');
+
+
+    mqtt.send(mqtt.game_topic,{
+      game:payload
+    });
+
+  }
+*/
 
 
 
@@ -1474,9 +1557,6 @@ class Game{
 
  
     g.players.map((e,i) => {
-      log('sending cards to user '+e.id);
-      log(card_for_user[i]);
-
         //unicast to user's id topic
         mqtt.send('USER/'+e.id,{
           game:{
@@ -1485,9 +1565,6 @@ class Game{
             initial : 1,
           }
         })
-
-
-        g.cards_with_players['e.id'] = card_for_everyone;
     });
   }
 

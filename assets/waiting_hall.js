@@ -403,6 +403,8 @@ class Waiting_hall{
 
 
 	game_topic_subscribed(){
+		log('game_topic_subscribed');
+
 		//this user is connected to host topic so send host a message that subscribed to you
 		mqtt.send(mqtt.host_topic,{game:{i_subscribed:t.details.id}});
 	}

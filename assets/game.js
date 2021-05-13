@@ -425,7 +425,7 @@ class Game{
 
     //if this is target player then opne card window
     if(player_id == t.details.id){
-      alert('my turn')
+      //alert('my turn')
 
       //check if this user already passed in this turn, then pass
       //or this user have no cards
@@ -1057,7 +1057,7 @@ class Game{
 
 
   messageArrived(m){
-    
+    log(m);
 
 
     if(m.i_subscribed){

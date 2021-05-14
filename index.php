@@ -32,6 +32,13 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 <style type="text/css">
 
 #splash[show='0']{left:-100%;transition:0.4s;}
+
+.blink{animation:blink 0.4s linear;}
+
+@keyframes blink{
+	0%,40%,80%{opacity:1;}
+	20%,60%,100%{opacity:0.3;}
+}
 </style>
 
 

@@ -128,8 +128,8 @@ class MqttCommunication{
 
 
 	send(topic,payload={}){
-		log("=== mqtt emision, publishing");
-		log(topic,payload);
+		//log("=== mqtt emision, publishing");
+		//log(topic,payload);
 
 		
 		if(mqtt.connected){

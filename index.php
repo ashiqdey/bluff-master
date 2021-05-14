@@ -31,130 +31,30 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 
 <style type="text/css">
 
-
-.card {position: relative;width:30px;}
-.card div{position: absolute;width:200%;top:0;left:0;}
-
-
-
-/*-----playing table------*/
-#table{top:55px;height:calc(100% - 300px);}
-#table .border{height:calc(100% - 20px);width:calc(100% - 20px);top:10px;left:10px;border-radius:20px;}
-#table .border_bg{background-image:linear-gradient(30deg,#c2ae81 21%,#5b4d2e 50%,#ebd7a8);height:150%;width:150%;top:-25%;left:-25%;}
-#table .border_bg[animate='1']{animation:rotate180 18s infinite linear}
-#table .carpet{background-image:radial-gradient(#30459f,#12153a);height:calc(100% - 20px);width:calc(100% - 20px);top:10px;left:10px;border-radius:12px;}
-
-#oldcards{position:absolute;top:20px;left:20px;}
-#oldcards .card{width:15px;}
-#oldcards .card div{width:250%;}
-#cards_on_table_count{top:10px;right:10px;border:2px solid #c5cdec;background:#fff;}
-
-#latest_card{width:100%;top:60%}
-#latest_card .card {width:25px;height:100px}
-
-#user_played{bottom:25px;left:25px;}
-#user_played .name{bottom: -14px;width: 80px;left: -15px;}
-/*-----playing table------*/
-
-
-
-
-/*-----card window------*/
-#card_window{height:240px;}
-#card_window .progress{height:3px;width:100%;}
-#card_window .progress>div{height:3px;background:#25E979;}
-
-#card_window[show='1']{height:345px;background:#373E57;z-index:4;}
-#card_window[show='1'] .progress>div{display:block;width:100%;animation:width100 20s}
-#card_window[show='1'] .form_self_turn{display:block;}
-#card_window[show='1'] .card{width:35px}
-
-#cards_chooseable{height:140px;}
-#cards_chooseable input:checked ~ .img_holder{box-shadow:0 0 0 5px rgb(14,238,252,.4)}
-#cards_chooseable input:checked ~ .img_holder:before{content:'';position:absolute;height:100%;width:100%;top:0;left:0; background:rgb(14,238,252,.15);}
-
-#cards_chooseable .img_holder:after{content: attr(card-no);position: absolute;top: 7px;left: 7px;font-size: 21px;color: #4b4b4b;font-weight: 700}
-#cards_chooseable input:checked ~ .img_holder:after{color: #027abd;}
-
-#card_no_chooser .text{border:2px solid #575f76;border-radius:6px;font-weight:700;font-size:1.2em;}
-#card_no_chooser input:checked ~ .text{border:2px solid #fff;background:#fff;color:var(--darkbg)}
-/*-----card window------*/
-
-
-
-
-
-
-/*-----player badge------*/
-#players .player:before{content:attr(count);background:#fff;height:28px;width:28px;border-radius:40px;position:absolute;top:-8px;right:-9px;display:flex;align-items:center;justify-content:center;font-size:0.8em;border:2px solid var(--darkbg);color:var(--darkbg);font-weight:500;z-index:2;}
-
-#players svg circle{stroke-dasharray:295,295;stroke-dashoffset:295;opacity:0;}
-#players .player[active='1'] svg circle{stroke-dashoffset:0;stroke:red;animation: timer_circle 20s linear;opacity:1;}
-
-
-@keyframes timer_circle{
-	0%{stroke-dashoffset:283;stroke:#1CEAA5}
-	50%{stroke-dashoffset:140;stroke:#1CEAA5}
-	100%{stroke-dashoffset:0;stroke:red}
-}
-
-
-
-
-
-/*----------score cards--------------*/
-#scorecard:not([show='1']){display:none;}
-.score_dot{height:10px;width:10px;margin:3px; border-radius:10px;background-color:var(--red);}
-.score_dot[score='1']{background:var(--aqua);}
-.score_dot[score='2']{background:var(--yellow);}
-
-#scorecard[show='1'] .wrap{animation:slidedown 0.2s linear;}
-#scorecard .list{max-height:350px;}
-
-@keyframes slidedown{
-	0%{transform:translateY(-70px);}
-	100%{transform:translateY(0);}
-}
-
-/*----------score cards--------------*/
-
-
-
-
-
-
-
-
-@media (min-width:900px){
-	#table{width:calc(40% - 20px);left:60%;height:calc(100% - 180px);top:70px;}
-	#card_window{width:60%;}
-	#card_window[show='1']{box-shadow:0;height:100%}
-	#card_window .card {width:45px;}
-	#card_window{height:calc(100% - 80px);}
-	#cards_chooseable{height:calc(100% - 200px);}
-	#cards_chooseable label{height:160px;}
-	#cards_chooseable .flex{flex-wrap: wrap;}
-	#card_no_chooser .text{height:45px;width:45px;}
-	#card_no_chooser .text:hover{background:rgba(255,255,255,0.08);}
-}
-
-
-
-
-
-
-
-
-
-
-
+#splash[show='0']{left:-100%;transition:0.4s;}
 </style>
 
 
 
 <div id="app"></div>
-<div id="notif_holder"></div>
 
+
+<div id="splash" class="pf h100 w100 z9000 t0 l0">
+	<div class="pa t50 l0 w100 tty-50 tc">
+		<img src="img/logo-transparent.webp" class="logo w150p">
+	</div>
+</div>
+
+
+
+
+<div id="notif" onclick="$('#notif').attr('show','0')" class="flex aic jcsb"></div>
+
+
+<audio id="audio_start" src="sound/start.ogg" style="display: none;"></audio>
+<audio id="audio_selected" src="sound/selected.ogg" style="display: none;"></audio>
+<audio id="audio_bluffed" src="sound/bluffed.ogg" style="display: none;"></audio>
+<audio id="audio_lose" src="sound/lose.ogg" style="display: none;"></audio>
 
 
 <script src="assets/vendor/jquery.min.js"></script>

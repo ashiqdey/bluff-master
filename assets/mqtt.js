@@ -85,8 +85,6 @@ class MqttCommunication{
 	onConnect(){
 		log("---MQTT Connected");
 
-		notif('Connected');
-
 		mqtt.connected=true;
 		mqtt.increase_reconn_interval('reset');
 	}

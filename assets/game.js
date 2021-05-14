@@ -1,4 +1,30 @@
 
+
+class Sfx{
+
+  start(){
+    $("#audio_start")[0].play();
+  }
+  selected(){
+    $("#audio_selected")[0].play();
+  }
+  lose(){
+    $("#audio_lose")[0].play();
+  }
+  bluffed(){
+    $("#audio_bluffed")[0].play();
+  }
+
+
+  
+}
+
+let sfx = new Sfx();
+
+
+
+
+
 class Game{
   constructor(){
 
@@ -15,6 +41,7 @@ class Game{
     //round will start when clicked this button
     $(document).on('click','#start_round',function(){
 			$(this).hide();
+      sfx.selected()
 			mqtt.send(mqtt.host_topic,{game:{start_round:1}})
 		})
 
@@ -26,11 +53,13 @@ class Game{
 
     $(document).on('click','#game_pass',function(e){
       e.preventDefault();
+      sfx.selected()
       g.i_pass();
     })
 
     $(document).on('click','#game_put',function(e){
       e.preventDefault();
+      sfx.selected()
       g.put_card();
     })
 
@@ -43,6 +72,7 @@ class Game{
 
 
     $(document).on('change',"#card_window input[name='selected_cards']",function(){
+      sfx.selected()
 			g.auto_Select_call($(this).val());
 		})
 
@@ -80,7 +110,7 @@ class Game{
 
 
 
-          <div id='chat_received' class='pf z5 black cgrey7 f08 br10'>sfd</div>
+          <div id='chat_received' class='pf z5 black cgrey7 f08 br10'></div>
         </div>
 
 
@@ -180,7 +210,19 @@ class Game{
 
             g.all_players_connected=1;
 
+
+
+            mqtt.send(mqtt.game_topic,{
+              game:{
+                new_round : g.round
+              }
+            });
+
+
             g.distribute_card();
+
+
+
           }
         }, 300);
 
@@ -294,6 +336,9 @@ class Game{
     log(m);
 
     if(m.initial){
+
+      sfx.start();
+
       g.my_cards = m.cards_received;
     
     }
@@ -934,6 +979,8 @@ class Game{
     let looser = (m.won == m.bluffed_by) ? m.bluffed_to : m.bluffed_by;
 
 
+    sfx.bluffed();
+
     if(by && to){
       notif(`${by.name} bluffed ${(m.won==by.id?'':' - wrong guess')}`);
     }
@@ -948,14 +995,18 @@ class Game{
     //this is the victim (not won)
     if(to.id == t.details.id && m.won!=t.details.id){
       log(`TO : ${to.id} CARDS:${m.cards.length}`);
-      log(m.cards);
 
-        g.cards_received({cards_received:m.cards})
+      window.navigator.vibrate([300, 100, 200]);
+      sfx.lose()
+
+      g.cards_received({cards_received:m.cards})
     }
     //bluffed by
     else if(by.id==t.details.id && m.won!=t.details.id){
       log(`BY : ${by.id} CARDS:${m.cards.length}`);
-      log(m.cards);
+
+      window.navigator.vibrate([2300, 100, 200]);
+      sfx.lose()
 
       g.cards_received({cards_received:m.cards})
     }
@@ -1038,6 +1089,11 @@ class Game{
   card_window(open=1){
     $('#card_window').attr('show',open);
 
+
+    if(open){
+      window.navigator.vibrate([300]);
+    }
+
     if(window.innerWidth < 900){
       if(open){
         $("#table").css({'top':'-45px'})
@@ -1059,6 +1115,9 @@ class Game{
     $('#start_round').show();
     $('#cards_chooseable .wrap').html('');
 
+    
+
+    g.stop_pass_timer();
     g.card_window(0);
   }
 
@@ -1169,6 +1228,12 @@ class Game{
 
     if(g.all_players_connected){
       g.distribute_card();
+
+      mqtt.send(mqtt.game_topic,{
+        game:{
+          new_round : g.round
+        }
+      });
     }
 
     
@@ -1181,11 +1246,7 @@ class Game{
     g.cards_with_players = {}
 
 
-    mqtt.send(mqtt.game_topic,{
-      game:{
-        new_round : g.round
-      }
-    });
+    
 
 
   }
@@ -1193,6 +1254,8 @@ class Game{
 
 
   start_round(){
+    
+
     if(t.host){
       g.players_ready++;
 

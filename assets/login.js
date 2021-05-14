@@ -150,6 +150,9 @@ class Auth{
         window.location = 'upload_dp';
       }
       else{
+
+        processing(auth.form)
+        
         t.timer_reload = setInterval(function(){
           if(mqtt.connected){
             clearInterval(t.timer_reload);

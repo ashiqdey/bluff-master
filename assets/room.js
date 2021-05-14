@@ -6,15 +6,18 @@ class Room{
 
     $(document).on('submit','#form_create_room',function(e){
       e.preventDefault();
+      sfx.selected();
       room.create_room();
     })
 
     $(document).on('submit','#form_join_room',function(e){
       e.preventDefault();
+      sfx.selected();
       room.join_room();
     })
 
     $(document).on('click','.join_room',function(){
+      sfx.selected();
       room.join_room(0,$(this).attr('room-id'));
     })
 

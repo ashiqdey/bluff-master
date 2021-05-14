@@ -5,6 +5,7 @@ let t = {
     rooms :'rooms',
     recent_players : 'recent_players',
     ud : 'ud', // user details
+    splash : 'splash'
   }
 }
 
@@ -51,7 +52,6 @@ $(function(){
       
 
 
-
       if(window.location.hash!='#room'){
         window.location.hash = '#room';
       }
@@ -62,8 +62,21 @@ $(function(){
   }
 
 
-  $('.loader_warp').html(loader());
-  make_notif()
+
+
+
+  /*------------splash------------------*/
+  if(check_ws('splash',1)){
+    $('#splash').remove()
+  }
+  else{
+    setTimeout(()=>{$('#splash').attr('show','0');},1500)
+    setTimeout(()=>{$('#splash').remove()},2100)
+    save_ws('splash',{splash:1},1)
+  }
+
+
+
 })
 
 
@@ -98,11 +111,7 @@ function getRandom(mn, mx) {
     return Math.round(Math.random() * (mx - mn) + mn); 
 }
 
-function make_notif(){
-	$('#notif_holder').html(`<div id="notif" onclick="$('#notif').attr('show','0')" class="flex aic jcsb">
 
-	</div>`);
-}
 function loader(){
 	return `<div class="loader"><div class="circular"><svg viewBox="25 25 50 50" class="w100"> <circle class="path" r='20' cx='50' cy='50'></circle> </svg></div></div>`
 }

@@ -95,6 +95,9 @@
 .p40_20{padding:40px 20px;}
 
 
+
+.pt0{padding-top:0}
+.pt10{padding-top:10px}
 .pt50{padding-top:50px}
 .plr5{padding-left:5px;padding-right:5px}
 .plr10{padding-left:10px;padding-right:10px}
@@ -267,6 +270,7 @@
 
 /*----------------bottom------------------*/
 .b0{bottom:0}
+.b10{bottom:10px}
 
 /*----------------left------------------*/
 .l0{left:0}

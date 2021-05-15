@@ -201,10 +201,11 @@ class Waiting_hall{
 	}
 
 	player_rejected(player_id){
+		sfx.bluffed();
 		$(`.player[player-id='${player_id}']`).remove();
 	}
 	player_accepted(player_id){
-
+		sfx.bluffed();
 		$(`.player[player-id='${player_id}'] .btn_holder`).html(`<div class='f08 o6'>Accepted</div>`);
 	}
 

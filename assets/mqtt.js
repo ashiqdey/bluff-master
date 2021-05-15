@@ -90,9 +90,14 @@ class MqttCommunication{
 	}
 
     subscribe(topic,callback=log){
-        log('subscribing to '+topic);
+       try{
+		log('subscribing to '+topic);
 
 		mqtt.client.subscribe(mqtt.topic_base+topic,{onSuccess:callback});
+	   }
+	   catch(e){
+		log(e);
+	   }
     }
 
 	unsubscribe(topic){

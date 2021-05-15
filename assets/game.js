@@ -1,7 +1,6 @@
 
 
 class Sfx{
-
   start(){
     $("#audio_start")[0].play();
   }
@@ -14,9 +13,12 @@ class Sfx{
   bluffed(){
     $("#audio_bluffed")[0].play();
   }
-
-
-  
+  win(){
+    $("#audio_win")[0].play();
+  }
+  mgs(){
+    $("#audio_message")[0].play();
+  }
 }
 
 let sfx = new Sfx();
@@ -60,13 +62,13 @@ class Game{
 
     $(document).on('click','#game_pass',function(e){
       e.preventDefault();
-      sfx.selected()
+      sfx.mgs();
       g.i_pass();
     })
 
     $(document).on('click','#game_put',function(e){
       e.preventDefault();
-      sfx.selected()
+      sfx.mgs();
       g.put_card();
     })
 
@@ -85,6 +87,17 @@ class Game{
 
     
 
+    $.getScript('assets/vendor/party.min.js', function() {
+      t.sparkles_event = {
+        clientX: (window.innerWidth / 2),
+        clientY:  (window.innerHeight / 2),
+        pageX: (window.innerWidth / 2),
+        pageY:  (window.innerHeight / 2),
+        offsetX: 0,
+        offsetY: 0,
+      }
+    });
+
   }
   
   
@@ -95,184 +108,128 @@ class Game{
     g.cards_with_players={};
 
 
-    $('#app').html(`
-      <div id='main_game' class="pf t0 l0 w100 h100">
+    $('#app').html(`<div id='main_game' class="pf t0 l0 w100 h100">
 
-        
+    <div class="progress">
+              <div class='dn'></div>
+          </div>
 
 
         <div id="players" class="pf z3 w100 t0 l0 flex z5">
           <div class="me p15 w80p"></div>
           <div class="opponennts w-80 ">
-            <div class="ofxa w100 tscroll">
-              <div class='flex p15 opponennt_players'></div>
-            </div>
+              <div class="ofxa w100 tscroll">
+                <div class='flex p15 opponennt_players'></div>
+              </div>
           </div>
         </div>
 
         <div id="table" class="pf w100 p10 z10">
           <div class="border p10 pa ofh">
-            <div class="border_bg pa optional_animation" animate='0'></div>
-            <div class="carpet pa p10">
-
-                <div class='pa w100 tc t50 l50 tt-50 z5 dn' id='start_round_wrap'> <div class="tc">Round <span class='round_no'></span></div> <button id='start_round' class='but fat theme mt20'>TAP TO START</button></div>
-
-                <div id="oldcards" class="flex"></div>
+              <div class="carpet pa p10">
+                <div class='pa w100 tc t50 l50 tt-50 z5 dn' id='start_round_wrap'>
+                    <div class="tc">Round <span class='round_no'></span></div>
+                    <button id='start_round' class='but fat theme mt20'>TAP TO START</button>
+                </div>
+                
                 <div id="cards_on_table_count" class="pa ic30 cgrey7 br30 ic f08 bolder">0</div>
-
-                <div id="latest_card" class="pa l50 tt-50 flex jcc"></div>
-
-                <div id="user_played" class="pa b0 tc"></div>
-                <div id="users_call" class="pa b0 w100p tc l50 ttx-50 p15 bold f12 flex aic" style="width: 94px;></div>
-                <div id="bluff_cta" class="pa b0 r0 p10">
-                  <button class="but mbut red p8_30 dn" id='bluff'>BLUFF</button>
+                <div id="latest_card" class="pa l50 t50 w100 tt-50 flex jcc"></div>
+                <div id="user_played" class="pa t10 tc"></div>
+                <div id="users_call" class="pa w100p tc l50 t0 ttx-50 p10 bold f12 flex aic jcc"></div>
+                <div id="bluff_cta" class="pa">
+                    <button class="but ic70 bsc db p8_30" id='bluff' style="background-image: url('img/bluff-btn.webp'); display: none;"></button>
                 </div>
 
-            </div>
+                <div id="oldcards" class="flex pa b10 l10 "></div>
+              </div>
           </div>
         </div>
 
 
 
-
-        <form id="card_window" class="pf l0 w100 b0" show='0'>
-          <div class="progress"><div class='dn'></div></div>
-
-          <div class="form_self_turn dn">
-            <div id='card_no_chooser' class="flex fww p10 jcc mt10 cgrey9"></div>
+        <form id="card_window" class="pf l0 w100 b0" show='0' mini='0'>
+          
+          <div class="form_self_turn dn card_no_chooser_wrap pt10">
+              <div id='card_no_chooser' class="flex fww plr10 cgrey9"></div>
           </div>
-
           <div class="ofxa w100 tscroll" id="cards_chooseable">
-            <div class="flex p20 wrap"></div>
+              <div class="flex p15 wrap"></div>
           </div>
-
           <div class="form_self_turn dn">
-            <div class="flex aic m2 jcsb p20 mw400 mcen">
-              <button class="but mr10 red" id="game_pass">PASS</button>
-              <button class="but ml10 theme" id="game_put">PUT</button>
-            </div>
+              <div class="flex aic m2 jcsb p15 pt0 mw400 mcen">
+                <button class="but mr10 red" id="game_pass">PASS</button>
+                <button class="but ml10 theme" id="game_put">PUT</button>
+              </div>
           </div>
-
         </form>
 
 
 
-
         <div class="ribbon flex aic darkbg jcsb p10 pf flex w100 b0 l0">
-          
           <div class="flex aic">
-            <span class="f12 bold ml10">Round - <span class='round_no'></span></span>
+              <span class="o6 ml10">Round - <span class='round_no'></span></span>
           </div>
           <!--div class="flex aic">
-            <div class="ic40 ic p5"><img src="icon/mic.svg" class=""></div>
-            <div class="ic40 ic p5 ml10"><img src="icon/chat.svg" class=""></div>
-            <div class="ic40 ic p5 ml10"><img src="icon/3dot.svg" class=""></div>
-          </div-->
-
-
-
+              <div class="ic40 ic p5"><img src="icon/mic.svg" class=""></div>
+              <div class="ic40 ic p5 ml10"><img src="icon/chat.svg" class=""></div>
+              <div class="ic40 ic p5 ml10"><img src="icon/3dot.svg" class=""></div>
+              </div-->
           <div class="flex aic">
-            <a href="#scorecard" class="ic40 ic p5" id='open_scorecard'><img src="icon/king.svg" class="dn"></a>
+            <div id='open_scorecard' class='dn'>
+              <a href="#scorecard" class="ic40 ic p5 black01 br50 p8"><img src="icon/king.svg" class="w100"></a>
+            </div>
           </div>
-
-
-
           <div id='chat_received' class='pf z5 black cgrey7 f08 br10'></div>
         </div>
 
 
 
-
         <div id='scorecard' class='overlay pf t0 w100 h100 l0 z4000' show='0'>
-        <div class='mask back mt'></div>
-        <div class='mask click_back sw'></div>
-        <div class="darkbg p15 wrap mw400 mcen">
-          <div class="flex jcfe p10 o6 f07 tc">
-            <div class="w130p">LAST 5</div>
-            <div class="w50p">SCORE</div>
+          <div class='mask back mt'></div>
+          <div class='mask click_back sw'></div>
+          <div class="darkbg p15 wrap mw400 mcen">
+              <div class="flex jcfe p10 o6 f07 tc">
+                <div class="w130p">LAST 5</div>
+                <div class="w50p">SCORE</div>
+              </div>
+              <hr>
+              <div class='list mt5 ofya'></div>
           </div>
-          <hr>
-          <div class='list mt5 ofya'></div>
-        </div>
         </div>
 
 
-      </div>`);
+        <div id="winner" show='0' class="pf h100 w100 z9000 t0 l0 black06"></div>
+
+    </div>`);
 
 
-      g.render_players()
-      
-      if(t.host){
-
-        
-
-
-        g.init_round();
-      }
-      
+    
+    
+    if(t.host){
+      g.init_round();
+    }
+    
 
 
 
-      /*--------render the card choosing buttons----------*/
-      const card_symbols = ['A','K','Q','J','2','3','4','5','6','7','8','9','10']
-      $("#card_no_chooser").html(card_symbols.map(make_no_sel).join(''));
+    /*--------render the card choosing buttons----------*/
+    const card_symbols = ['2','3','4','5','6','7','8','9','10','A','J','K','Q']
+    $("#card_no_chooser").html(card_symbols.map(e=>`<label class="p5 pr cp"> <input type="radio" name="call" value="${e}" class="pa o0"> <div class="text ic35 ic">${e}</div> </label>`).join(''));
 
-      function make_no_sel(e){
-        return `<label class="p5 pr cp">
-          <input type="radio" name="call" value="${e}" class="pa o0">
-          <div class="text ic35 ic">${e}</div>
-        </label>`
-      }
-      /*--------render the card choosing buttons----------*/
-
+    g.render_players()
 
 
   }
+
+
+
+
 
 
 
 
 
   
-  render_scorecard(){
-    //after every round emit score card
-    /*
-
-    {
-      12 : [
-        score,
-        history
-      ],
-      12 : [
-        5,
-        [2,3,4]
-      ]
-    }
-    */
-    
-    $("#scorecard .list").html(Object.keys(g.scorecard).map(make).join(''));
-    
-
-    function make(e){
-
-      let player = g.get_player
-      let last5 = e[1].map(e=>`<span class='score_dot' score='1'></span>`).join('')
-
-      return `<div class="p5 flex jcsb aic">
-        <div class="flex aic w50">
-          <div class="ic35 greyd br50 bsc" style="background-image:url(img/dp/${player.id}.jpg)"></div>
-          <div class="lc1 cgrey5 ml10 w-50">${player.name}</div>
-        </div>
-        <div class="w50 flex">
-          <div class="last_5 flex w-50">${last5}</div>
-          <div class="tc w50p">${e[0]}</div>
-        </div>
-      </div>`
-    }
-    
-  }
-
-
 
 
 
@@ -357,9 +314,9 @@ class Game{
 
 
 
-    function make(e){
-      return `<label class="card" card-no="${e}">
-        <input type="checkbox" name="selected_cards" value="${e}" class="pa o0">
+    function make(e,i){
+      return `<label class="card" card-no="${e}-${i}">
+        <input type="checkbox" name="selected_cards" value="${e}-${i}" class="pa o0">
         <div class="img_holder pr" card-no='${e}'><img src="img/blank_card.webp" class="w100 br8"></div>
       </label>`
     }
@@ -392,8 +349,11 @@ class Game{
 
 
   auto_Select_call(v){
+    v = v.split('-')[0]
+
     //if turn call exisst the dont change the call, call selector are disabled
     if(g.turn_call)return;
+
 
     //get the value
     $(`#card_no_chooser input[name='call'][value='${v}']`).prop('checked',true)
@@ -466,16 +426,18 @@ class Game{
       }
       else{
         //open card window
-        g.card_window(1)
+        
 
 
 
         /*------disable, enable call selector-----*/
         $("#card_no_chooser input[name='call']").prop('disabled',(!g.turn_call ? false:true))
         if(!g.turn_call){
+          g.card_window(1,0)
           $(`#card_no_chooser input[name='call']:checked`).prop('checked',false)
         }
         else{
+          g.card_window(1,1)
           $(`#card_no_chooser input[name='call'][value='${g.turn_call}']`).prop('checked',true)
         }
         /*------disable, enable call selector-----*/
@@ -502,6 +464,8 @@ class Game{
 
 
   stop_pass_timer(){
+    log('stop_pass_timer');
+
     if(g.timer_waiting_to_pass){
       clearTimeout(g.timer_waiting_to_pass)
       delete g.timer_waiting_to_pass;
@@ -512,18 +476,17 @@ class Game{
 
 
   i_pass(text=1){
+    log(`i_pass ---- ${text}`);
+
     g.card_window(0)
-    
 
     //if user didnt repospond withing 10 sec, or manually passed, stop timer
     g.stop_pass_timer();
-
 
     mqtt.send(mqtt.game_topic, {game : {
       passed : t.details.id,
       text : (text ? `${t.details.name} passed` : 0)
     }});
-
   }
 
 
@@ -608,10 +571,12 @@ class Game{
     }
   
 
+    let selected_cards=[];
 
     form.map((e) => {
       if(e.name=='selected_cards'){
-        payload.cards.push(e.value)
+        selected_cards.push(e.value)
+        payload.cards.push(e.value.split('-')[0])
       }
       if(e.name=='call' && !g.turn_call){
         //no call exists so allow to pass new call
@@ -638,10 +603,38 @@ class Game{
 
     /*----remove cards-------*/
     //remove select cards from my cards
-    g.my_cards =  g.my_cards.filter(x => !payload.cards.includes(x));
+    //remove one by one cards from main array
+    let index;
+
+    log('605 g.my_cards');
+    log(g.my_cards);
+    payload.cards.map(e=>{
+      log('---LOOP--');
+
+      //remove the first cards
+      index = g.my_cards.findIndex(x => x==e);
+
+      log(index);
+
+      g.my_cards.splice(index,1);
+
+      log(g.my_cards);
+
+    });
+
+    log('614 g.my_cards');
+    log(g.my_cards);
+    log('selected_cards');
+    log(selected_cards);
+
+
+
+    //this will remove all same no. cards
+    //g.my_cards =  g.my_cards.filter(x => !payload.cards.includes(x));
+
 
     //remove from ui
-    payload.cards.map(e=>{
+    selected_cards.map(e=>{
       $(`#card_window .card[card-no='${e}']`).remove();
     })
     g.render_card_count({[t.details.id] : g.my_cards.length});
@@ -752,7 +745,7 @@ class Game{
 
       
     //show turn call
-    $('#users_call').html(`<span class='o6 ic ic35 f09 br50 count' style="border: 1px solid #7881bf;">${m.cards.length}X</span> &nbsp; ${g.turn_call}`);
+    $('#users_call').html(`<span class='o6 ic ic40 f09 br50 count mr10' style="border: 1px solid #7881bf;">${m.cards.length}X</span><span>${g.turn_call}</span>`);
 
 
 
@@ -767,7 +760,7 @@ class Game{
     g.render_lastet_card();
 
     //show user profile
-    $('#user_played').html(`<div class="dp ic50 b3sf br30 greyd bsc" style="background-image:url(img/dp/${player.id}.jpg)"></div><div class="name pa white cgrey7 br20 p5 lc1 f08 bold">${player.name}</div>`);
+    $('#user_played').html(`<div class="dp ic50 b3sf br30 greyd bsc" style="background-image:url(img/dp/${player.id}.jpg)"></div><!--div class="name pa white cgrey7 br20 p5 lc1 f08 bold">${player.name}</div-->`);
 
     //stop circle animation
     $(`#players .player[player-id='${m.pid}']`).attr('active','0')
@@ -802,6 +795,21 @@ class Game{
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+  /*------------------------------winner--------------------------------*/
+
+
   new_winner(pid,score=0){
     log("-------new_winner");
 
@@ -816,6 +824,10 @@ class Game{
 
     log(`NEW winner iD:${pid}, score : ${score}`);
 
+    if(!g.scorecard){
+      g.scorecard={}
+    }
+
     if(g.scorecard[pid]){
       g.scorecard[pid][0] = score;
       g.scorecard[pid][1].push(rank)
@@ -828,9 +840,141 @@ class Game{
       g.scorecard[pid] = [score,[rank]]
     }
 
+
+    mqtt.send(mqtt.game_topic,{
+      game : {
+        new_winner : {
+          [pid]:g.scorecard[pid]
+        }
+      }
+    })
+
+    
+
+
     log("scorecard");
     log(g.scorecard);
   }
+
+
+
+
+  arrPop(r){
+    return r[(r.length  -1)]
+  }
+  
+  
+  winner_declared(m,rank=0){
+    console.groupCollapsed('-------winner_declared--------');
+
+    if(!g.scorecard){
+      g.scorecard={}
+    }
+
+    log('old scorecard');
+    log(g.scorecard);
+
+    Object.keys(m).map(e=>{
+      g.scorecard[e] = m[e];
+
+      if(e == t.details.id){
+
+        sfx.win();
+        rank = g.arrPop(m[e][1]);
+
+        log('I am winner');
+        log(m[e]);
+        log(rank);
+
+        if(rank <= 3){
+          $('#winner').attr('show','1').html(`<div class="pa t50 l0 w100 tty-50 tc"><img src="img/${rank}.webp" class="h100p rank pr z1"><br><img src="img/winner.webp" class="text w200p z2 pr"></div>`)
+        
+          setTimeout(()=>{party.sparkles(t.sparkles_event)},500);
+          setTimeout(()=>{party.sparkles(t.sparkles_event)},900);
+  
+          setTimeout(()=>{$('#winner').attr('show','0')},4000)
+        }
+      }
+
+    });
+
+
+    log('updated scorecard');
+    log(g.scorecard);
+
+    console.groupEnd();
+  }
+
+
+
+
+  scorecard_received(m){
+    log('-----------scorecard_received');
+    log(m);
+    g.scorecard = m;
+
+    log('g.scorecard');
+    log(g.scorecard);
+
+    //show the button
+    $('#open_scorecard').show();
+  }
+
+
+
+  
+  render_scorecard(){
+    if(!g.scorecard)return;
+
+
+
+
+    //after every round emit score card
+    /*
+
+    {
+      12 : [
+        score,
+        history
+      ],
+      12 : [
+        5,
+        [2,3,4]
+      ]
+    }
+    */
+
+
+    $("#scorecard .list").html(Object.keys(g.scorecard).map(make).join(''));
+    
+
+    function make(id){
+
+      let each  = g.scorecard[id];
+
+      let player = g.get_player(id);
+      let last5 = each[1].map(e=>`<span class='score_dot' score='${e}'></span>`).join('')
+
+      return `<div class="p5 flex jcsb aic">
+        <div class="flex aic w50">
+          <div class="ic35 greyd br50 bsc" style="background-image:url(img/dp/${player.id}.jpg)"></div>
+          <div class="lc1 cgrey5 ml10 w-50">${player.name}</div>
+        </div>
+        <div class="w50 flex">
+          <div class="last_5 flex w-50">${last5}</div>
+          <div class="tc w50p">${each[0]}</div>
+        </div>
+      </div>`
+    }
+    
+  }
+
+
+
+
+  /*------------------------------winner--------------------------------*/
+
+
 
 
 
@@ -893,7 +1037,7 @@ class Game{
     let c='';
     let max = (g.total_cards_on_table > 12 ? 12 : g.total_cards_on_table)
     for(let ic=0;ic<max;ic++){
-      c += '<div class="card"><div class="img_holder pr"><img src="img/card.webp" class="w100 br6"></div></div>';
+      c += '<div class="card"><div class="img_holder pr"><img src="img/card.webp" class="w100 br4"></div></div>';
     }
     $("#oldcards").html(c);
   }
@@ -987,7 +1131,7 @@ class Game{
 
     //this is the victim (not won)
     if(m.loser==t.details.id){
-      log(`I LOST : ${to.id} CARDS:${m.cards.length}`);
+      log(`I LOST : ${m.loser} CARDS:${m.cards.length}`);
 
       window.navigator.vibrate([300, 100, 200]);
       sfx.lose()
@@ -1069,18 +1213,23 @@ class Game{
 
 
 
-  card_window(open=1){
+  card_window(open=1,mini=0){
 
     
 
-    $('#card_window').attr('show',open);
+    $('#card_window').attr('show',open).attr('mini',mini);
 
 
     if(open){
-      window.navigator.vibrate([300]);
+      
+      window.navigator.vibrate([200,100]);
+
+      $('#scorecard').attr("show",'0');
     }
 
-    if(window.innerWidth < 900){
+    if(!mini && window.innerWidth < 900){
+
+      return;
       if(open){
         $("#table").css({'top':'-45px'})
       }
@@ -1173,14 +1322,23 @@ class Game{
       g.cards_played(m.cards_played);
     }
 
-    else if(m.round_over){
-      g.round_over(m.round_over);
+    else if(m.round_over || m.scorecard){
+
+      if(m.scorecard){
+        g.scorecard_received(m.scorecard);
+      }
+
+      if(m.round_over){
+        g.round_over(m.round_over);
+      }
+
     }
 
-    else if(m.scorecard){
-      g.scorecard_received(m);
+    else if(m.new_winner){
+      g.winner_declared(m.new_winner);
     }
 
+    
 
     
 
@@ -1193,22 +1351,9 @@ class Game{
   }
 
 
-  round_over(m){
-    notif(`Round ${m.round} over`);
-
-    g.empty_table();
-    $('#card_window .wrap').html('');
-    $('#players .player').attr('count','0');
-  }
 
 
 
-
-
-  scorecard_received(m){
-    log(m);
-    //open_scorecard
-  }
 
 
 
@@ -1222,12 +1367,13 @@ class Game{
 
 
     if(g.all_players_connected){
-      g.invite_for_new_round()
+      //invite with a delay of 4 sec
+      setTimeout(g.invite_for_new_round(),4000)
     }
     else{
       //check every 300ms if all user conected or not
       g.timer_subscriber = setInterval(() => {
-        if(g.players_subscribed.length >= g.players.length){
+        if(g.all_players_connected || (g.players_subscribed && g.players_subscribed.length >= g.players.length)){
 
           clearInterval(g.timer_subscriber)
           delete g.timer_subscriber;
@@ -1246,13 +1392,54 @@ class Game{
 
 
     g.winners             = []
-    g.scorecard          = {}
-    g.round               = (!g.round) ? 1 : (g.round+1);
+    
+    g.round               = (!g.round ? 1 : (g.round+1));
     g.players_ready       = 0;
     g.cards_with_players = {}
 
 
   }
+
+
+
+
+  round_over(round = 0){
+
+    if(!round && t.host){
+
+      //round over so geenrate score cards for all
+      g.players.map(e=>{
+        //those whose dont have name in winner array add score for them
+        if(!g.winners.includes(e.id)){
+          g.new_winner(e.id)
+        }
+      });
+
+
+      mqtt.send(mqtt.game_topic,{
+        game : {
+          round_over : g.round,
+          scorecard : g.scorecard
+        }
+      })
+  
+      setTimeout(g.init_round,2000);
+      return;
+    }
+
+    notif(`Round ${round} over`);
+
+    g.old_cards_on_table = [];
+    g.latest_cards_on_table = [];
+    g.total_cards_on_table = 0;
+    g.empty_table();
+    
+
+    $('#card_window .wrap').html('');
+    $('#players .player').attr('count','0');
+
+  }
+
 
 
 
@@ -1305,11 +1492,17 @@ class Game{
 
 
   get_player_id(index){
+    log(index);
+
     return g.players[index].id;
   }
 
   get_player_index(id){
     return g.players.findIndex(e=>e.id==id)
+  }
+
+  get_player(id){
+    return g.players.find(e=>e.id==id)
   }
 
 
@@ -1342,12 +1535,12 @@ class Game{
      if(players_with_cards.length == 1){
 
        console.groupEnd('all completed, now start new round');
-       g.init_round();
+       g.round_over();
+       return;
      }
 
 
-
-
+     
 
 
 
@@ -1364,13 +1557,13 @@ class Game{
     let loop=0;
 
     while(!allowed_to_start_turn){
-      log(`-----while`);
+      log(`-----while SFT`);
 
       //looped for all user, no one is allowed to play cards, so start fresh round
       if(loop >= g.players.length){
         console.groupEnd(`1206 - loop ${loop}, players:${g.players.length},  `);
 
-        g.init_round();
+        g.round_over();
         allowed_to_start_turn=1;
         return;
       }
@@ -1410,6 +1603,9 @@ class Game{
       loop++;
     }
     
+    //else if first player passes error will bw thrown
+    g.last_played_index = g.turn_started_by_index;
+
 
     log(`turn will be started by : ${g.turn_of_id}`);
     
@@ -1458,6 +1654,7 @@ class Game{
     if((g.winners.length + g.passed_players.length) >= g.players){
       console.groupEnd('all completed, now start new turn');
       g.start_fresh_turn();
+      return;
     }
 
 
@@ -1477,9 +1674,12 @@ class Game{
       }
 
 
-
+      log(g.last_played_index);
+      
       //who will start the turn
       g.last_played_index = g.get_next_player_index(g.last_played_index)
+
+      log(g.last_played_index);
 
       g.turn_of_id = g.get_player_id(g.last_played_index)
 
@@ -1513,6 +1713,34 @@ class Game{
     console.groupEnd('--------end of start-next-turn-------');
 
   }
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

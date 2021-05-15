@@ -6,7 +6,7 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 <head>
 	<title>Bluff Master</title>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
+	<meta name="viewport" content="width=device-width,user-scalable=no">
 	<link rel="apple-touch-icon" sizes="57x57" href="img/logo/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="img/logo/apple-icon-60x60.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="img/logo/apple-icon-72x72.png">
@@ -33,7 +33,7 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 
 #splash[show='0']{left:-100%;transition:0.4s;}
 
-.blink{animation:blink 0.4s linear;}
+.blink{animation:blink 0.5s linear;}
 
 @keyframes blink{
 	0%,40%,80%{opacity:1;}
@@ -55,6 +55,8 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 
 
 
+
+
 <div id="notif" onclick="$('#notif').attr('show','0')" class="flex aic jcsb"></div>
 
 
@@ -62,6 +64,8 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 <audio id="audio_selected" src="sound/selected.ogg" style="display: none;"></audio>
 <audio id="audio_bluffed" src="sound/bluffed.ogg" style="display: none;"></audio>
 <audio id="audio_lose" src="sound/lose.ogg" style="display: none;"></audio>
+<audio id="audio_win" src="sound/win.ogg" style="display: none;"></audio>
+<audio id="audio_message" src="sound/mgs.ogg" style="display: none;"></audio>
 
 
 <script src="assets/vendor/jquery.min.js"></script>
@@ -72,6 +76,8 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 <script src="assets/waiting_hall.js"></script>
 <script src="assets/game.js"></script>
 <script src="assets/common.js"></script>
+
+
 </body>
 </html>
 

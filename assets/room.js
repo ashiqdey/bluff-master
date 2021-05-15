@@ -17,7 +17,7 @@ class Room{
     })
 
     $(document).on('click','.join_room',function(){
-      sfx.selected();
+      sfx.mgs();
       room.join_room(0,$(this).attr('room-id'));
     })
 

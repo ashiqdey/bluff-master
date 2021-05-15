@@ -4,7 +4,7 @@
 :root {
   --robo: 'Roboto',Helvetica,sans-serif,arial;
 
-  --theme:#5b86ca;
+  --theme:#2c5ece;
   --red:#E4546C;
 
   --aqua:#00EAF1;
@@ -89,6 +89,12 @@ ul{padding:0;margin:0;}
 
 
 .red{background:var(--red);}
+
+
+.black01{background:rgba(0,0,0,0.1);}
+.black06{background:rgba(0,0,0,0.6);}
+
+
 
 
 

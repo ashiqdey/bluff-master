@@ -70,8 +70,8 @@ $(function(){
     $('#splash').remove()
   }
   else{
-    setTimeout(()=>{$('#splash').attr('show','0');},1500)
-    setTimeout(()=>{$('#splash').remove()},2100)
+    setTimeout(()=>{$('#splash').attr('show','0');},2000)
+    setTimeout(()=>{$('#splash').remove()},2600)
     save_ws('splash',{splash:1},1)
   }
 
@@ -305,6 +305,9 @@ function on_hashchanged(new_hash,old_hash){
 
 
 function show(ele,type){
+  log(`-----show ${ele} ${type}`);
+
+
 
   if(ele=='#room'){
     if(!room){
@@ -313,8 +316,8 @@ function show(ele,type){
     room.render_room_ui();
   }
   else{
-    if(ele=='#scorecard' && g){
-      g.render_scorecard()
+    if(ele=='#scorecard' && type && g.render_scorecard){
+      g.render_scorecard();
     }
 
 

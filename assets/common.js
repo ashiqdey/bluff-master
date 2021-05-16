@@ -87,18 +87,24 @@ function logout_other_device(){
   
   */
   //send a mqqt message to logout any other device is exists
-  t.lod_timer = setInterval(function(){
+  t.load_timer = setInterval(function(){
     if(mqtt.connected){
-      clearInterval(t.lod_timer);
-      delete t.lod_timer;
+      log('mqtt connected 92 common.js');
+
+      clearInterval(t.load_timer);
+      delete t.load_timer;
 
       //first send message
       t.client = t.details.id+''+new Date().getTime();
-      mqtt.send(t.details.id,{authenticated:t.details.id,client:t.client})
+      mqtt.user_topic = 'USER/'+t.details.id;
+      mqtt.send(mqtt.user_topic,{authenticated:t.details.id,client:t.client})
+
+      log('mqtt sent authenticated');
+
 
       setTimeout(function(){
+        log('mqtt sent authenticated');
         //then subscribe, after 1 sec delay
-        mqtt.user_topic = 'USER/'+t.details.id;
         mqtt.subscribe(mqtt.user_topic);
       },500);
 

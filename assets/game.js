@@ -120,7 +120,7 @@ class Game{
           </div>
 
 
-        <div id="players" class="pf z3 w100 t0 l0 flex z5">
+        <div id="players" class="pf z3 w100 t0 l0 flex z5 hwt">
           <div class="me p15 w80p"></div>
           <div class="opponennts w-80 ">
               <div class="ofxa w100 tscroll">
@@ -158,7 +158,7 @@ class Game{
 
 
 
-        <form id="card_window" class="pf l0 w100 b0" show='0' mini='0'>
+        <form id="card_window" class="pf l0 w100 b0 hwt" show='0' mini='0'>
           
           <div class="form_self_turn dn card_no_chooser_wrap pt10">
               <div id='card_no_chooser' class="flex fww plr10 cgrey9"></div>
@@ -176,7 +176,7 @@ class Game{
 
 
 
-        <div class="ribbon flex aic darkbg jcsb p10 pf flex w100 b0 l0">
+        <div class="ribbon flex aic darkbg jcsb p10 pf flex w100 b0 l0 hwt">
           <div class="flex aic">
               <span class="o6 ml10">Round - <span class='round_no'></span></span>
           </div>
@@ -246,7 +246,7 @@ class Game{
       })
     }
 
-    $('#chat input').focus()
+    $("#form_chat input[name='chat']").focus()
   }
 
   send_mgs(){
@@ -1445,49 +1445,31 @@ class Game{
 
 
     if(m.i_subscribed){
-      log(m);
-
-      //some user subscribed game topic
+      if(!g.players_subscribed){
+        g.players_subscribed=[];
+      }
       if(!g.players_subscribed.includes(m.i_subscribed)){
         g.players_subscribed.push(m.i_subscribed)
       }
     }
     else if(m.new_round){
-      
-
-      //m.new_round = round no.
       g.render_new_round(m.new_round);
     }
     else if(m.start_round){
       g.start_round()
     }
-
-
     else if(m.fresh_turn){
-      log(m);
-
-      //m.fresh_turn = id of player who will start the turn
       g.render_current_turn(m.fresh_turn,1)
     }
-
     else if(m.next_turn){
-      log(m);
-
-      //next_turn : g.turn_of_id,
       g.render_current_turn(m.next_turn,0)
     }
-
-    //card received (from distrubution/ table)
     else if(m.cards_received && m.player_id==t.details.id){
       g.cards_received(m);
     }
-    
     else if(m.card_counts){
-      //recevie user id, card count (k,v)
       g.render_card_count(m.card_counts);
     }
-
-    
     else if(m.passed){
       g.passed(m);
     }
@@ -1497,36 +1479,23 @@ class Game{
     else if(m.cards_played){
       g.cards_played(m.cards_played);
     }
-
     else if(m.round_over || m.scorecard){
-
       if(m.scorecard){
         g.scorecard_received(m.scorecard);
       }
-
       if(m.round_over){
         g.round_over(m.round_over);
       }
-
     }
-
     else if(m.new_winner){
       g.winner_declared(m.new_winner);
     }
-
     else if(m.mgs){
       g.mgs_recevied(m);
     }
-
-    
     else if(m.exit_room){
       g.exit_room(m.exit_room);
     }
-
-    
-    
-    
-
 
     else{
       log('--- Game mqtt');
@@ -1555,7 +1524,6 @@ class Game{
     g.cards_with_players = {}
     
 
-
     if(g.all_players_connected){
       //invite with a delay of 4 sec
       setTimeout(g.invite_for_new_round(),4000)
@@ -1570,10 +1538,7 @@ class Game{
           delete g.players_subscribed;
 
           g.all_players_connected=1;
-
           g.invite_for_new_round()
-          
-
         }
       }, 300);
     }
@@ -1612,6 +1577,10 @@ class Game{
       setTimeout(g.init_round,2000);
       return;
     }
+
+
+    setTimeout(()=>{party.sparkles(t.sparkles_event)},500);
+    setTimeout(()=>{party.sparkles(t.sparkles_event)},900);
 
     notif(`Round ${round} over`);
 

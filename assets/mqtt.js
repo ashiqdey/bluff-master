@@ -25,6 +25,9 @@ class MqttCommunication{
 
         //this.topic_base = `bm.xbl.com/bluff_master/`;
         this.topic_base = `ashiqdey@gmail.com/bfm/`;
+		this.global_topic = 'global/1';
+		this.server_topic = 'SERVER/1';
+		
 
 		this.client;
 		this.connected=false;
@@ -51,6 +54,8 @@ class MqttCommunication{
 
 	connect(){
 		try{
+			if(!mqtt.host)return;
+
 			mqtt.increase_reconn_interval(mqtt.reconnect_interval);
 
 			// Create a client instance
@@ -87,6 +92,8 @@ class MqttCommunication{
 
 		mqtt.connected=true;
 		mqtt.increase_reconn_interval('reset');
+
+		mqtt.subscribe(mqtt.global_topic);
 	}
 
     subscribe(topic,callback=log){
@@ -136,7 +143,6 @@ class MqttCommunication{
 		//log("=== mqtt emision, publishing");
 		//log(topic,payload);
 
-		
 		if(mqtt.connected){
 			let mgs = new Paho.MQTT.Message(JSON.stringify(payload));
 			mgs.destinationName = mqtt.topic_base + topic;
@@ -149,15 +155,8 @@ class MqttCommunication{
 
 
 	onMessageArrived(m){
-		m = m.payloadString;
+	  	m = JSON.parse(m.payloadString);
 
-		
-		
-
-	  	m = JSON.parse(m);
-
-
-	
 	 	if(m.waiting_hall){
 			if(wh){
 				wh.messageArrived(m.waiting_hall)
@@ -169,10 +168,21 @@ class MqttCommunication{
 			}
 		}
 		else if(m.authenticated){
+			log(m);
+
 			if(m.client != t.client && t.details && t.details.id == m.authenticated){
 				notif('Your account was logged in from another device');
 				window.location = 'logout';
 			}
+		}
+		else if(m.ping){
+			mqtt.send(mqtt.server_topic,{pong:1})
+		}
+		else if(m.disconnect){
+			delete mqtt.host;
+
+			mqtt.client.disconnect();
+			notif("You were disconnected from server");
 		}
 
 		else{
@@ -186,6 +196,18 @@ class MqttCommunication{
 }
 
 
+/*
+to check how many user is connected
+broadcast
+
+mqtt.send(global_topic,{ping:1})
+data wil lbe received in server_topic
+--------
+
+to disconnect all clients 
+mqtt.send(global_topic,{disconnect:1})
+
+*/
 
 
 

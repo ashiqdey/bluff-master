@@ -1,4 +1,5 @@
 <?php
+	//setcookie("ubm",'0', time() - 3600,'/','xbytelab.com',false);
 	setcookie("ubm", '0', time() - 3600, '/');
 ?>
 <!DOCTYPE html>

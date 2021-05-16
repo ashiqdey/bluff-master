@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bluff Master - Game</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+
+
+	<link rel="apple-touch-icon" sizes="57x57" href="img/logo/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="img/logo/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="img/logo/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="img/logo/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="img/logo/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="img/logo/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="img/logo/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="img/logo/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="img/logo/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="img/logo/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo/favicon-16x16.png">
+	<link rel="manifest" href="/manifest.json">
+	<meta name="msapplication-TileColor" content="#373E57">
+	<meta name="msapplication-TileImage" content="img/logo/ms-icon-144x144.png">
+	<meta name="theme-color" content="#373E57">
+
+	<link rel="stylesheet" type="text/css" href="../assets/home.css">
+
+</head>
+<body>
+
+<style type="text/css">
+
+
+.card {position: relative;width:30px;}
+.card div{position: absolute;width:200%;top:0;left:0;}
+
+
+
+
+
+#table{top:55px;height:calc(100% - 300px);}
+
+#table .border{height:calc(100% - 20px);width:calc(100% - 20px);top:10px;left:10px;border-radius:20px;}
+#table .border_bg{
+	background-image:linear-gradient(#d1b36e 21%,#816e40 50%,#ffdf95);
+	height:150%;width:150%;top:-25%;left:-25%;}
+
+#table .border_bg[animate='1']{animation:rotate180 18s infinite linear}
+
+
+
+
+
+#table .carpet{background-image:radial-gradient(#3C44A3,#1F2561);height:calc(100% - 20px);width:calc(100% - 20px);top:10px;left:10px;border-radius:12px;}
+
+
+
+#oldcards{position:absolute;top:20px;left:20px;}
+#oldcards .card{width:15px;}
+#oldcards .card div{width:250%;}
+#cards_on_table_count{top:10px;right:10px;border:2px solid #c5cdec;background:#fff;}
+
+
+
+#latest_card{width:100%;top:60%}
+#latest_card .card {width:25px;height:100px}
+
+
+#user_played{bottom:25px;left:25px;}
+#user_played .name{bottom: -14px;width: 80px;left: -15px;}
+
+
+
+
+
+
+
+#card_window{height:240px;}
+#card_window .progress{height:3px;width:100%;}
+#card_window .progress>div{height:3px;background:#25E979;}
+
+
+#card_window[show='1']{height:345px;background:#373E57;z-index:4;}
+#card_window[show='1'] .progress>div{display:block;width:100%;animation:progress_self 10s}
+
+#card_window[show='1'] .form_self_turn{display:block;}
+
+@keyframes progress_self{
+	0%{width:0%;}
+	100%{width:100%;}
+}
+
+#cards_chooseable{height:140px;}
+#cards_chooseable input:checked ~ .img_holder{box-shadow:0 0 0 5px rgb(14,238,252,.4)}
+#cards_chooseable input:checked ~ .img_holder:before{content:'';position:absolute;height:100%;width:100%;top:0;left:0; background:rgb(14,238,252,.15);}
+
+#card_no_chooser .text{border:2px solid #575f76;border-radius:6px;font-weight:700;font-size:1.2em;}
+#card_no_chooser input:checked ~ .text{border:2px solid #fff;background:#fff;color:var(--darkbg)}
+
+
+
+
+
+
+
+
+.player:before{content:attr(count);background:#fff;height:28px;width:28px;border-radius:40px;position:absolute;top:-13px;right:-13px;display:flex;align-items:center;justify-content:center;font-size:0.8em;border:2px solid var(--darkbg);color:var(--darkbg);font-weight:500;}
+
+
+
+@media (min-width:900px){
+	#table{width:calc(40% - 20px);left:60%;height:calc(100% - 180px);top:70px;}
+	#card_window{width:60%;}
+	#card_window[show='1']{box-shadow:0;height:100%}
+
+	#card_window .card {width:45px;}
+
+	#card_window{height:calc(100% - 80px);}
+	#cards_chooseable{height:calc(100% - 200px);}
+	#cards_chooseable label{height:160px;}
+	#cards_chooseable .flex{flex-wrap: wrap;}
+
+	#card_no_chooser .text{height:45px;width:45px;}
+	#card_no_chooser .text:hover{background:rgba(255,255,255,0.08);}
+}
+
+</style>
+
+<div id='main_game' class="pf t0 l0 w100 h100">
+
+	<div class="ribbon flex aic jcsb p10">
+		<div class="flex aic ca" sel='#card_window' t='show' v='1'>
+			<img src="../icon/king.svg" class="ic25">
+			<span class="f12 bold ml10">Round - 1</span>
+		</div>
+		<div class="flex aic">
+			<div class="ic40 ic p5"><img src="../icon/mic.svg" class=""></div>
+			<div class="ic40 ic p5 ml10"><img src="../icon/chat.svg" class=""></div>
+			<div class="ic40 ic p5 ml10"><img src="../icon/3dot.svg" class=""></div>
+		</div>
+	</div>
+
+
+
+	<div id="table" class="pf w100 p10">
+		<div class="border p10 pa ofh">
+			<div class="border_bg pa optional_animation" animate='0'></div>
+			<div class="carpet pa">
+				<div id="oldcards" class="flex">
+					<div class="card">
+						<div class="img_holder pr"><img src="../img/card.webp" class="w100"></div>
+					</div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					<div class="card"><div class="img_holder pr"><img src="../img/card.webp" class="w100"></div></div>
+					
+				</div>
+				<div id="cards_on_table_count" class="pa ic30 cgrey7 br30 ic f08 bolder">12</div>
+
+
+				<div id="latest_card" class="pa l50 tt-50 flex jcc">
+					<div class="card">
+						<div class="img_holder pr"><img src="../img/card.webp" class="w100"></div>
+					</div>
+					<div class="card">
+						<div class="img_holder pr"><img src="../img/card.webp" class="w100"></div>
+					</div>
+					<div class="card">
+						<div class="img_holder pr"><img src="../img/card.webp" class="w100"></div>
+					</div>
+				</div>
+
+
+				<div id="user_played" class="pa b0 tc">
+					<div class="dp ic50 b3sf br30 greyd"></div>
+					<div class="name pa white cgrey7 br20 p5 lc1 f08 bold">Jhonsdsdssdsd</div>
+				</div>
+				<div id="users_call" class="pa b0 w100 tc l0 p15 bold f12">3X jack</div>
+				<div id="bluff_cta" class="pa b0 r0 p10">
+					<button class="but mbut red p8_30">BLUFF</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<div id="card_window" class="pf l0 w100 b0" show='0'>
+		<div class="progress dn"><div></div></div>
+
+		<div class="ofxa w100 tscroll" id="cards_chooseable">
+			<div class="flex p20" style="width:700px;">
+				<label class="card">
+					<input type="checkbox" name="selected_cards" class="pa o0">
+					<div class="img_holder pr"><img src="../img/card.webp" class="w100"></div>
+				</label>
+
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+				<label class="card"> <input type="checkbox" name="selected_cards" class="pa o0"> <div class="img_holder pr"><img src="../img/card.webp" class="w100"></div> </label>
+
+			
+
+
+			</div>
+
+		</div>
+
+
+
+		<div class="form_self_turn dn">
+			<div id='card_no_chooser' class="flex fww p10 jcc mt10 cgrey9">
+				<label class="p5 pr cp">
+					<input type="radio" name="no_choosed" class="pa o0">
+					<div class="text ic35 ic">A</div>
+				</label>
+
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">K</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">Q</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">J</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">2</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">3</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">4</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">5</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">5</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">6</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">7</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">8</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">9</div> </label>
+				<label class="p5 pr cp"> <input type="radio" name="no_choosed" class="pa o0"> <div class="text ic35 ic">10</div> </label>
+			</div>
+
+
+			<div class="flex aic m2 jcsb p20 mw400 mcen">
+				<button class="but mr10 red">PASS</button>
+				<button class="but ml10 theme">PUT</button>
+			</div>
+		</div>
+	</div>
+
+
+
+
+	<div id="players" class="pf z3 w100 b0 l0 flex">
+		<div class="me p15 w80p">
+			<div class="ic50 greyd b3sf br6 pr player" count='2'></div>
+		</div>
+		<div class="opponennts  w-80 darkbg">
+			<div class="ofxa w100 tscroll">
+				<div class='flex p15' style="width:450px;">
+					<div class="ic50 greyd b3sopp br6 mr20 pr player" count='15'></div>
+					<div class="ic50 greyd b3sopp br6 mr20 pr player" count='2'></div>
+					<div class="ic50 greyd b3sopp br6 mr20 pr player" count='12'></div>
+					<div class="ic50 greyd b3sopp br6 mr20 pr player" count='2'></div>
+					<div class="ic50 greyd b3sopp br6 mr20 pr player" count='0'></div>
+					<div class="ic50 greyd b3sopp br6 mr20 pr player" count='2'></div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+
+</div>
+
+
+
+
+<style>
+
+#scorecard:not([show='1']){display:none;}
+.score_dot{height:10px;width:10px;margin:3px; border-radius:10px;background-color:var(--red);}
+.score_dot[score='1']{background:var(--aqua);}
+.score_dot[score='2']{background:var(--yellow);}
+
+#scorecard[show='1'] .wrap{animation:slidedown 0.2s linear;}
+#scorecard .list{max-height:350px;}
+
+@keyframes slidedown{
+	0%{transform:translateY(-70px);}
+	100%{transform:translateY(0);}
+}
+
+
+</style>
+
+<div id='scorecard' class='overlay pf t0 w100 h100 l0 z4000 ' show='1'>
+	<div class='mask'></div>
+
+	<div class="darkbg p15 wrap mw400 mcen">
+		<div class="flex jcfe p10 o6 f07 tc">
+			<div class="w130p">LAST 5</div>
+			<div class="w50p">SCORE</div>
+		</div>
+
+		<hr>
+
+		<div class='list mt5 ofya'>
+			<div class="p5 flex jcsb aic">
+				<div class="flex aic w50">
+					<div class="ic35 greyd br50"></div>
+					<div class="lc1 cgrey5 ml10 w-50">Jhon sdfdsf sdfdsf</div>
+				</div>
+				<div class="w50 flex">
+					<div class="last_5 flex w-50">
+						<span class='score_dot' score='1'></span>
+						<span class='score_dot' score='4'></span>
+						<span class='score_dot' score='3'></span>
+						<span class='score_dot' score='2'></span>
+						<span class='score_dot' score='5'></span>
+					</div>
+					<div class="tc w50p">
+						45
+					</div>
+				</div>
+			</div>
+
+
+			
+
+
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+			<div class="p5 flex jcsb aic"> <div class="flex aic w50"> <div class="ic35 greyd br50"></div> <div class="lc1 cgrey5 ml10 w-50">Jhonfdsddfssdfdsf</div> </div> <div class="w50 flex"> <div class="last_5 flex w-50"> <span class='score_dot' score='1'></span> <span class='score_dot' score='4'></span> <span class='score_dot' score='3'></span> <span class='score_dot' score='2'></span> <span class='score_dot' score='5'></span> </div> <div class="tc w50p"> 45 </div> </div> </div>
+
+
+			
+
+			
+		</div>
+	</div>
+</div>
+
+
+
+<div id="notif_holder"></div>
+
+
+
+<script src="../assets/vendor/jquery.min.js"></script>
+<script src="../assets/common.js"></script>
+
+
+</body>
+</html>
+
+
+

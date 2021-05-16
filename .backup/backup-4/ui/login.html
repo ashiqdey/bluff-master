@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bluff Master - Login</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+
+
+	<link rel="apple-touch-icon" sizes="57x57" href="img/logo/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="img/logo/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="img/logo/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="img/logo/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="img/logo/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="img/logo/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="img/logo/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="img/logo/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="img/logo/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="img/logo/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo/favicon-16x16.png">
+	<link rel="manifest" href="/manifest.json">
+	<meta name="msapplication-TileColor" content="#373E57">
+	<meta name="msapplication-TileImage" content="img/logo/ms-icon-144x144.png">
+	<meta name="theme-color" content="#373E57">
+
+	<link rel="stylesheet" type="text/css" href="assets/home.css">
+
+</head>
+<body>
+
+<style type="text/css">
+	
+</style>
+
+<div class="tc p30 pa t50 tty-50 w100">
+	<img src="img/logo-transparent.webp" class="w160p hwt">
+
+	<div id="input_holder" class="mt80 mw400 mcen">
+		<form id="form_email" processing='0'>
+			<div class="ninput">
+				<input type="text" name="email" placeholder='.'>
+				<label>Email</label>
+			</div>
+			<div class="mt50">
+				<button class="but theme fat w100  ca" sel='#input_holder' t='sl' v='2'>NEXT</button>
+				<div class="loader"></div>
+			</div>
+		</form>
+	</div>
+
+</div>
+
+
+<div id="notif_holder"></div>
+
+
+<script src="assets/vendor/jquery.min.js"></script>
+<script src="assets/common.js"></script>
+<script>
+
+
+
+
+
+
+
+$(document).on('submit','#form_email',function(e){
+	e.preventDefault();
+	let form = '#form_email';
+
+	processing(form)
+
+	let email = $(form+" input[name='email']");
+
+	if(email.val().indexOf('@') < 0 || email.val().indexOf('.') < 2){
+		email.focus();
+		notif('Enter valid email');
+		return ;
+	}
+
+	ajax('api/login','POST',{email:email.val()},login_checked)
+})
+
+
+
+
+$(document).on('submit','#form_name',function(e){
+	e.preventDefault();
+	let form = '#form_name';
+
+	processing(form)
+
+	let name = $(form+" input[name='name']");
+
+	if(name.val().length < 3){
+		name.focus();
+		notif('Enter your name');
+		return ;
+	}
+
+	name = name.val();
+	name = name.split(' ')[0];
+
+	ajax('api/login','POST',{name:name},login_checked)
+})
+
+
+
+
+
+
+$(document).on('submit','#form_password',function(e){
+	e.preventDefault();
+	let form = '#form_password';
+
+	processing(form)
+
+	let password = $(form+" input[name='password']");
+
+	if(password.val().length < 6){
+		password.focus();
+		notif('Atleast 6 characters');
+		return ;
+	}
+
+	ajax('api/login','POST',{password:password.val()},login_checked)
+})
+
+
+
+
+function login_checked(r){
+	log(r);
+
+	if(r.error){
+		notif(r.error);
+	}
+	else{
+		r = r.data;
+
+		if(r.name){
+			$('#input_holder').html(getcode('name'));
+		}
+		else if(r.password){
+			$('#input_holder').html(getcode('password'));
+		}
+	}
+
+	function getcode(name){
+		return `<form id="form_${name}" processing='0'>
+			<div class="ninput">
+				<input type="text" name="${name}" placeholder='.'>
+				<label class='ttc'>${name}</label>
+			</div>
+			<div class="mt50">
+				<button class="but theme fat w100 ">NEXT</button>
+				<div class="loader">`+loader()+`</div>
+			</div>
+		</form>`;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+</body>
+</html>
+
+
+

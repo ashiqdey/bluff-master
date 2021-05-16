@@ -85,6 +85,11 @@ class Game{
 			g.auto_Select_call($(this).val());
 		})
 
+
+    
+
+
+    
     
 
     $.getScript('assets/vendor/party.min.js', function() {
@@ -142,7 +147,10 @@ class Game{
 
                 <div id="oldcards" class="flex pa b10 l10 "></div>
 
-                <div id="bluff" show='0' class="pa h100 w100 z9000 t0 l0"></div>
+                <div id="bluffed" class="pa h100 w100 z900 t0 br10 l0 black06" show='0'></div>
+
+          
+
 
               </div>
           </div>
@@ -174,9 +182,9 @@ class Game{
           </div>
 
           <div class="flex aic">
-            <div id='' class='ml10'>
+            <!--div id='' class='ml10'>
               <a href="#mic" class="ic40 ic p5 black01 br50 ix-mic"></a>
-            </div>
+            </div-->
             <div id='' class='ml10'>
               <a href="#chat" class="ic40 ic p5 black01 br50 ix-chat"></a>
             </div>
@@ -195,7 +203,8 @@ class Game{
         <div id='scorecard' class='overlay pf t0 w100 h100 l0 z4000' show='0'></div>
         <div id="more" class="overlay pf t0 w100 h100 l0 z4000" show="0"></div>
         <div id="winner" show='0' class="pf h100 w100 z9000 t0 l0 black06"></div>
-        
+
+        <div id="chat" show='0' class="pa w100 z9000 b0 l0 whitebg bsllg"></div>
 
     </div>`);
 
@@ -220,7 +229,49 @@ class Game{
 
 
 
+  render_chat(){
+    if(!t.rendered.includes('render_chat')){
+      t.rendered.push('render_chat');
+      $('#chat').html(`<div class="flex p15">
+        <form id='form_chat' class="w-60 mr10 darkbg pr flex aic jcsb br30">
+          <input name='chat' class="w100 p15 cgrey9 trans bor0 f1" placeholder="Type..." autocomplete='off'>
+          <button class="ix-send ic ic50 darkbg cgrey9 f12 bor0 br50 mr10"></button>
+        </form>
+        <button class="ix-cross ic ic50 darkbg cgrey9 bor0 br50 click_back"></button>
+      </div>`);
 
+      $(document).on('submit',"#form_chat",function(e){
+        e.preventDefault();
+        g.send_mgs();
+      })
+    }
+
+    $('#chat input').focus()
+  }
+
+  send_mgs(){
+    let mgs = $("#form_chat input[name='chat']");
+    if(mgs!=''){
+      mqtt.send(mqtt.game_topic,{
+        game:{
+          mgs:mgs.val(),
+          from : t.details.id
+        }
+      });
+
+      window.history.back();
+      mgs.val('').blur(); 
+    }
+  }
+
+
+  mgs_recevied(m){
+    // m.mgs, m.from
+    if(m.from != t.details.id){
+      let player = g.get_player(m.from);
+      notif(`${player.name} : ${m.mgs}`);
+    }
+  }
 
 
 
@@ -228,7 +279,7 @@ class Game{
     if(t.rendered.includes('more'))return;
     t.rendered.push('more');
 
-    $('#more .wrap').html(`<div class="mask back mt"></div>
+    $('#more').html(`<div class="mask back mt"></div>
     <div class="mask click_back sw"></div>
     <div class="darkbg wrap w100 mw400 mcen pa b0 l50 ttx-50 brt20 ofh">
       
@@ -277,12 +328,12 @@ class Game{
       mqtt.unsubscribe(mqtt.game_topic);
 
       //remove all data from g
-      delete g.winners;
-      delete g.scorecard;
-      delete g.round;
-      delete g.my_cards;
-      delete g.players;
-      delete g.cards_with_players;
+      g.winners = [];
+      g.scorecard = {}
+      g.round=0;
+      g.my_cards=[]
+      g.cards_with_players={}
+      g.players=[]
       
       //take him to room
       window.location.hash = 'room'
@@ -291,18 +342,29 @@ class Game{
     }
 
     else{
+      if(!g.players)return;
+
       let player = g.get_player(id)
       notif(`${player.name} left the game`);
 
+      if(g.cards_with_players[id]){
+        delete g.cards_with_players[id]
+      }
+      
       //remove the player from list
       g.players = g.players.filter(e=>e.id != id);
 
       //re render the ui
       g.render_players();
 
+      g.render_card_count(g.cards_with_players);
+
+
       //remove from score cards
       if(t.host){
-        delete g.scorecard[id]
+        if(g.scorecard){
+          delete g.scorecard[id]
+        }
       }
     }
   }
@@ -318,6 +380,9 @@ class Game{
 
 
   render_players(){
+    log('render_players');
+
+
     /*
     render the playes on bottom bar
     */
@@ -332,6 +397,11 @@ class Game{
     player_divided = player_divided.concat(g.players.slice(0,index))
 
     g.players = player_divided;
+
+    log(g.players);
+
+    $('#players .opponennt_players').html('');
+
 
     player_divided.map((e,i) => {
       if(i==0){
@@ -507,9 +577,11 @@ class Game{
         return;
       }
       else{
-        //open card window
         
-
+        //hide popups
+        $('#scorecard').attr('show','0');
+        $('#more').attr('show','0');
+        $('#chat').attr('show','0');
 
 
         /*------disable, enable call selector-----*/
@@ -911,7 +983,7 @@ class Game{
     }
 
     if(g.scorecard[pid]){
-      g.scorecard[pid][0] = score;
+      g.scorecard[pid][0] += score;
       g.scorecard[pid][1].push(rank)
 
       if(g.scorecard[pid][1].length > 5){
@@ -1008,7 +1080,7 @@ class Game{
   render_scorecard(){
     if(!g.scorecard)return;
 
-    $("#scorecard .list").html(`<div class='mask back mt'></div>
+    $("#scorecard").html(`<div class='mask back mt'></div>
     <div class='mask click_back sw'></div>
     <div class="darkbg p15 wrap mw400 mcen">
       <div class="flex jcfe p10 o6 f07 tc">
@@ -1142,7 +1214,13 @@ class Game{
 
     log(g.latest_cards_on_table);
 
+
+
     
+
+
+    
+
 
     g.latest_cards_on_table.map(e=>{
 
@@ -1201,18 +1279,29 @@ class Game{
 
 
 
-    sfx.bluffed();
-
-    if(by && to){
-      notif(`${by.name} bluffed ${(m.won==by.id?'':' - wrong guess')}`);
-    }
-
-
     g.clear_next_timer();
     g.stop_bluff_timer();
     g.stop_pass_timer();
     g.card_window(0);
     
+
+
+    $('#bluffed').attr('show','1').html(`<div class="pa t50 l0 w100 tty-50 tc">
+      <img src="img/bluffed.webp" class="text w200p z2 pr">
+      <div class="flex jcsb mcen w200p mt40">
+        <div class="bsc ic50 br50 greyd dp_anim pr" style="background-image:url(img/dp/${by.id}.jpg)" type='${(by.id==m.won ? 'win':'lose')}'>
+          <div class="pa b-40 tc l-50 w100p lc1">${by.name}</div>
+        </div>
+        <div class="bsc ic50 br50 greyd dp_anim pr" style="background-image:url(img/dp/${to.id}.jpg)" type='${(to.id==m.won ? 'win':'lose')}'>
+          <div class="pa b-40 tc l-50 w100p lc1">${to.name}</div>
+        </div>
+      </div>
+    </div>`);
+
+    setTimeout(function(){$('#bluffed').attr('show','0')},2000)
+
+
+
 
     //this is the victim (not won)
     if(m.loser==t.details.id){
@@ -1227,6 +1316,8 @@ class Game{
       g.cards_with_players[m.loser] += m.cards.length
 
       log(`cards counter for looser, user=${m.loser} : `+g.cards_with_players[m.loser]);
+
+      sfx.bluffed();
 
       //render the cards who loosed
       g.render_card_count({[m.loser] : g.cards_with_players[m.loser]})
@@ -1423,7 +1514,11 @@ class Game{
       g.winner_declared(m.new_winner);
     }
 
+    else if(m.mgs){
+      g.mgs_recevied(m);
+    }
 
+    
     else if(m.exit_room){
       g.exit_room(m.exit_room);
     }
@@ -1453,6 +1548,11 @@ class Game{
   init_round(){
     log('--------------------init_round------------------------');
 
+    g.winners             = []
+    
+    g.round               = (!g.round ? 1 : (g.round+1));
+    g.players_ready       = 0;
+    g.cards_with_players = {}
     
 
 
@@ -1481,11 +1581,7 @@ class Game{
     
 
 
-    g.winners             = []
-    
-    g.round               = (!g.round ? 1 : (g.round+1));
-    g.players_ready       = 0;
-    g.cards_with_players = {}
+   
 
 
   }
@@ -1536,6 +1632,15 @@ class Game{
 
 
   invite_for_new_round(){
+
+    //only 1 memeber in room then exit room
+    if(g.players.length < 2){
+      notif("You can't play alone, invite some members");
+      g.exit_room();
+    }
+
+
+
     //boardcast invitation for enw round
     mqtt.send(mqtt.game_topic,{
       game:{

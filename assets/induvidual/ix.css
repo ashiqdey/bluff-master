@@ -21,3 +21,6 @@
 .ix-chat:before{content:'\0045';}
 .ix-edit:before{content:'\0046';}
 .ix-exit_room:before{content:'\0047';}
+.ix-send:before{content:'\0048';}
+.ix-cross:before{content:'\0049';}
+.ix-down:before{content:'\004a';}

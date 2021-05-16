@@ -217,7 +217,8 @@ function notif(t){
 const popup_hash = [
     '#room',
     '#scorecard',
-    '#more'
+    '#more',
+    '#chat'
   ]
   
 
@@ -320,11 +321,13 @@ function show(ele,type){
     if(ele=='#scorecard' && type && g.render_scorecard){
       g.render_scorecard();
     }
-
-    if(ele=='#more' && type && g.render_more){
+    else if(ele=='#more' && type && g.render_more){
       g.render_more()
     }
-
+    else if(ele=='#chat' && type && g.render_chat){
+      g.render_chat()
+    }
+    
 
     $(ele).attr("show",type);
 

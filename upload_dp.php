@@ -43,6 +43,12 @@ if(!isset($_COOKIE['ubm'])){
 			<button id="upload_btn" class="cp but m1l0 aqua" onclick="upload()">UPLOAD</button>
 		</div>
 		<div id="loading_bar" class='w100 p10 mt100' style='display:none'><prog><child></child></prog></div>
+
+		<a href="index">
+			<button class="but w100 z0 pr redl mt30">SKIP</button>
+		</a>
+
+
 	</div>
 </div>
 

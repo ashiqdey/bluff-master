@@ -206,6 +206,7 @@ body,html{
 
 #winner .rank{animation:winner_rank 0.8s linear;}
 #winner .text{animation:winner_text 0.5s linear;}
+#bluffed .text{animation:winner_text 0.4s linear;}
 @keyframes winner_text{
 	0%{transform:scale(0);}
 	70%{transform:scale(1.3);}
@@ -224,7 +225,31 @@ body,html{
 
 
 
+#chat[show='0'],
+#bluffed[show='0'],
 #winner[show='0'],
 #more[show='0'],
 #bluff[show='0']{display:none;}
+
+
+
+
+
+/*----------bluffed-------------*/
+.dp_anim[type='lose']{animation:red_pulse 0.6s linear infinite;}
+.dp_anim[type='win']{animation:win_pulse 0.8s linear infinite;}
+
+@keyframes win_pulse{
+	0%{box-shadow:0 0 0 0px rgb(35, 241, 145,1)}
+	100%{box-shadow:0 0 0 20px rgb(35, 241, 145,0)}
+}
+@keyframes red_pulse{
+	0%{box-shadow:0 0 0 0px rgba(255,0,0,1),0 0 0 10px rgba(255,0,0,0.3);}
+	25%{box-shadow:0 0 0 5px rgba(255,0,0,0.6),0 0 0 15px rgba(255,0,0,0);}
+	50%{box-shadow:0 0 0 10px rgba(255,0,0,0.3),0 0 0 20px rgba(255,0,0,0);}
+	75%{box-shadow:0 0 0 15px rgba(255,0,0,0),0 0 0 0px rgba(255,0,0,1);}
+	100%{box-shadow:0 0 0 20px rgba(255,0,0,0),0 0 0 5px rgba(255,0,0,10.6);}
+}
+/*----------bluffed-------------*/
+
 

@@ -24,32 +24,22 @@ let g = 0;
 
 $(function(){
 
-  t.loggedin = $('body').attr('loggedin');
+  t.loggedin = parseInt($('body').attr('loggedin'));
   t.page = $('body').attr('page');
 
-  if(t.loggedin=='0'){
+  if(!t.loggedin){
     //load login script
-    auth = new Auth();
-    auth.load_ui();
+    load_login_ui();
+
+
+
   }
   else{
     if(t.page=='index'){
 
-      //check if login data exists
-      if(!check_ws('ud')){
-        window.location='logout';
-        return;
-      }
-
-      t.details = fetch_ws('ud');
-
-      mqtt = new MqttCommunication();
-      mqtt.connect();
-
-
-      logout_other_device();
-      
-      
+      //check login
+      //save data
+      get_loggedin_data()
 
 
       if(window.location.hash!='#room'){
@@ -57,13 +47,11 @@ $(function(){
       }
 
       get_route();
+
+      a2hsinit();
     }
     
   }
-
-
-
-
 
   /*------------splash------------------*/
   if(check_ws('splash',1)){
@@ -76,41 +64,109 @@ $(function(){
   }
 
 
-
 })
 
 
 
-function logout_other_device(){
-  /*
-  logout from other device , if same account is logged into two devices
-  
-  */
-  //send a mqqt message to logout any other device is exists
-  t.load_timer = setInterval(function(){
-    if(mqtt.connected){
-      log('mqtt connected 92 common.js');
-
-      clearInterval(t.load_timer);
-      delete t.load_timer;
-
-      //first send message
-      t.client = t.details.id+''+new Date().getTime();
-      mqtt.user_topic = 'USER/'+t.details.id;
-      mqtt.send(mqtt.user_topic,{authenticated:t.details.id,client:t.client})
-
-      log('mqtt sent authenticated');
-
-
-      setTimeout(function(){
-        log('mqtt sent authenticated');
-        //then subscribe, after 1 sec delay
-        mqtt.subscribe(mqtt.user_topic);
-      },500);
-
-    }
-  },200)
+function logout(){
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = 'logout';
 }
+
+
+function get_loggedin_data(r=0){
+  if(!r){
+    //if available in cahce do nothing
+    if(check_ws('ud')){
+      user_data_found()
+      return;
+    }
+
+    ajax('api/user_data','POST',{d:'error'},get_loggedin_data)
+  }
+  else{
+    log(r);
+
+    if(r.error){
+      log("error");
+      logout()
+      return;
+    }
+
+
+    //if account details is received then save in local
+    if(r.data.id){
+      save_ws('ud',r.data);
+      user_data_found(r.data);
+    }
+    else{
+      log("id not found");
+      logout()
+    }
+
+  }
+
+
+  function user_data_found(ud=0){
+    if(!ud){
+      t.details = fetch_ws('ud');
+    }
+    else{
+      t.details = ud;
+    }
+    
+
+
+    //first send message
+    t.client = t.details.id+''+new Date().getTime();
+    mqtt = new MqttCommunication();
+    mqtt.connect();
+
+
+
+
+    t.timer_send = setInterval(function(){
+      if(mqtt.connected){
+        clearInterval(t.timer_send);
+        delete t.timer_send;
+
+        //logout same account from other devices
+        mqtt.user_topic = 'USER/'+t.details.id;
+        mqtt.send(mqtt.user_topic,{authenticated:t.details.id,client:t.client})
+
+
+        //subsscribe to user topic
+        mqtt.subscribe(mqtt.user_topic);
+      }
+    },200)
+  }
+}
+
+
+
+
+function load_login_ui(){
+  $('#app').html(`<div class="tc p30 pa t50 tty-50 w100">
+    <img src="img/logo-transparent.webp" class="w160p hwt">
+    <div id="input_holder" class="mt80 mw400 mcen">
+
+      <a href='https://xbytelab.com/account/google?redirect=https://xbytelab.com/game/bluffmaster/' class='db mt50'><button class="but white w100 flex jcc f1 cgrey7 aic"><img src='icon/google.svg' class='ic30 mr10'><span>Login with google</span></button></a>
+
+      <a href='https://xbytelab.com/account/facebook?redirect=https://xbytelab.com/game/bluffmaster/' class='db mt50'><button class="but theme w100  flex jcc f1 white aic" style='background: #405dff;'><img src='icon/fb.svg' class='ic30 mr10'><span>Login with Facebook</span></button></a>
+
+      <a href='https://xbytelab.com/account/twitter?redirect=https://xbytelab.com/game/bluffmaster/' class='db mt50'><button class="but theme w100  flex jcc f1 white aic" style='background:#03a9f4;'><img src='icon/twitter.svg' class='ic30 mr10'><span>Login with Twitter</span></button></a>
+
+    </div>
+  </div>`);
+}
+
+
+
+
+
+
+
 
 
 function getRandom(mn, mx) { 
@@ -118,8 +174,8 @@ function getRandom(mn, mx) {
 }
 
 
-function loader(){
-	return `<div class="loader"><div class="circular"><svg viewBox="25 25 50 50" class="w100"> <circle class="path" r='20' cx='50' cy='50'></circle> </svg></div></div>`
+function loader(size='40px',stroke='var(--theme)'){
+	return `<div class="loader" style='width:${size};height:${size};'><div class="circular"><svg viewBox="25 25 50 50" class="w100"> <circle class="path" r='20' cx='50' cy='50' stroke='${stroke}'></circle> </svg></div></div>`
 }
 
 
@@ -403,3 +459,32 @@ function check_ws(key,session=0){
 
 
 
+function getPWADisplayMode() {
+  log("Is full screen");
+  log(window.matchMedia('(display-mode: fullscreen)').matches);
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  if (document.referrer.startsWith('android-app://')) {
+    return 'twa';
+  } else if (navigator.standalone || isStandalone) {
+    return 'standalone';
+  }
+  return 'browser';
+}
+
+//trash the beforeinstallprompt event
+ function a2hsinit(){
+    window.addEventListener('beforeinstallprompt', function(e){
+      e.preventDefault();
+      console.log('beforeinstallprompt fired');
+      if(e.prompt){
+        window.deferredPrompt = e;
+        return false;
+      }
+    });
+}
+
+//trigger deferredPrompt to allow the user install PWA
+function install(){
+  deferredPrompt.prompt();
+}

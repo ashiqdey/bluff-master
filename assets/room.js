@@ -289,11 +289,7 @@ class Room{
     forward_hash('waiting_hall')
 
 
-    //make room topic
-		mqtt.room_topic = 'ROOM/'+t.active_room.id;
-	
-		//start listning from all members of this room
-		mqtt.subscribe(mqtt.room_topic);
+
 
 
     //render waiting hall
@@ -302,8 +298,15 @@ class Room{
     }
     wh.render_waiting_hall();
 
-  }
 
+    //make room topic
+    mqtt.room_topic = 'ROOM/'+t.active_room.id;
+  
+    //start listning from all members of this room
+    mqtt.subscribe(mqtt.room_topic,wh.entered_room);
+
+
+  }
 
 
 

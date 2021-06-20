@@ -1,5 +1,5 @@
 <?php
-$loggedin = isset($_COOKIE['ubm'])?1:0;
+$loggedin = isset($_COOKIE['xtk'])?1:0;
 ?>
 <!DOCTYPE html>
 <html>
@@ -20,10 +20,10 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 	<link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="img/logo/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="img/logo/favicon-16x16.png">
-	<link rel="manifest" href="/manifest.json">
-	<meta name="msapplication-TileColor" content="#373E57">
+	<link rel="manifest" href="manifest.json">
+	<meta name="msapplication-TileColor" content="#373e57">
 	<meta name="msapplication-TileImage" content="img/logo/ms-icon-144x144.png">
-	<meta name="theme-color" content="#373E57">
+	<meta name="theme-color" content="#373e57">
 	<link rel="stylesheet" type="text/css" href="assets/home.css">
 </head>
 <body loggedin='<?= $loggedin?>'  page='index'>
@@ -68,14 +68,83 @@ $loggedin = isset($_COOKIE['ubm'])?1:0;
 <audio id="audio_message" src="sound/mgs.ogg" style="display: none;"></audio>
 
 
+
+
+<style type="text/css">
+
+
+</style>
+<div id="update_banner" class="w100 pf l0 b0 p20 dn">
+	<div class="flex aic jcsb whitebg w100 p15 br8">
+		<div class="w-100 text">New update available</div>
+		<button id="update_app" class="cyellow boldest trans p12 bor0">UPDATE</button>
+	</div>
+</div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/hmac-min.js"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256-min.js"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
+
 <script src="assets/vendor/jquery.min.js"></script>
 <script src="assets/vendor/paho-mqtt.min.js"></script>
 <script src="assets/mqtt.js"></script>
-<script src="assets/login.js"></script>
 <script src="assets/room.js"></script>
 <script src="assets/waiting_hall.js"></script>
 <script src="assets/game.js"></script>
 <script src="assets/common.js"></script>
+
+
+
+
+<script type="text/javascript">
+"serviceWorker"in navigator&&(navigator.serviceWorker.register("sw.js").then(function(e){console.log("Y")}).catch(function(e){console.log("SW No",e)}));
+
+
+navigator.serviceWorker.ready.then(function(reg) {
+  listenForWaitingServiceWorker(reg, promptUserToRefresh);
+});
+
+
+function listenForWaitingServiceWorker(reg, callback) {
+  function awaitStateChange() {
+    reg.installing.addEventListener('statechange', function() {
+      if (this.state === 'installed') callback(reg);
+    });
+  }
+  if (!reg) return;
+  if (reg.waiting) return callback(reg);
+  if (reg.installing) awaitStateChange();
+  reg.addEventListener('updatefound', awaitStateChange);
+}
+
+
+navigator.serviceWorker.addEventListener('controllerchange',function() {
+    if (t.refreshing) return;
+    t.refreshing = true;
+    log("updated 1175");
+   // alert("Updated");
+    window.location.reload();
+});
+
+function promptUserToRefresh(reg) {
+    log("update available");
+    $("#update_banner").show();
+
+	document.getElementById("update_app").addEventListener("click", function() {
+		$("#update_banner .flex").html("<div class='flex aic'>"+loader('30px','#00EAF1') + "<span class='ml10'>Updating...</span></div>");
+		reg.waiting.postMessage('skipWaiting');
+	});
+}
+
+
+
+</script>
+
 
 
 </body>

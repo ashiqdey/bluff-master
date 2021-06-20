@@ -10,21 +10,8 @@ Mqtt Communication
 
 class MqttCommunication{
 	constructor(){
-		//this.host = 'test.mosquitto.org';
-		//this.port = 8080;
 
-		
-
-		this.host = 'maqiatto.com';
-		this.port = 8883;
-
-		this.user = 'ashiqdey@gmail.com'
-		this.password = 'qwerty123'
-
-
-
-        //this.topic_base = `bm.xbl.com/bluff_master/`;
-        this.topic_base = `ashiqdey@gmail.com/bfm/`;
+        this.topic_base = `bm.xbl.com/bm/`;
 		this.global_topic = 'global/1';
 		this.server_topic = 'SERVER/1';
 		
@@ -54,30 +41,21 @@ class MqttCommunication{
 
 	connect(){
 		try{
-			if(!mqtt.host)return;
-
 			mqtt.increase_reconn_interval(mqtt.reconnect_interval);
+			mqtt.client = new Paho.MQTT.Client(getEndpoint(), t.client);
 
-			// Create a client instance
-			mqtt.client = new Paho.MQTT.Client(mqtt.host, mqtt.port, "");
 
-			// set callback handlers
 			mqtt.client.onConnectionLost = mqtt.onConnectionLost;
 			mqtt.client.onMessageArrived = mqtt.onMessageArrived;
 
-			let connect_option={
-				onSuccess: mqtt.onConnect,
-				onFailure: mqtt.try_reconnect
-			}
-			
-			if(mqtt.user && mqtt.password){
-				connect_option.userName=mqtt.user;
-				connect_option.password=mqtt.password;
-			}
 
-			// connect the client
-			mqtt.client.connect(connect_option)
-
+			mqtt.client.connect({ 
+				useSSL: true, 
+				timeout: 3, 
+				mqttVersion: 4, 
+				onSuccess:mqtt.onConnect,
+				onFailure:mqtt.try_reconnect,
+			}); 
 
 		}
 		catch(err){
@@ -156,6 +134,7 @@ class MqttCommunication{
 
 	onMessageArrived(m){
 	  	m = JSON.parse(m.payloadString);
+	  	console.log(m);
 
 	 	if(m.waiting_hall){
 			if(wh){
@@ -170,9 +149,9 @@ class MqttCommunication{
 		else if(m.authenticated){
 			log(m);
 
-			if(m.client != t.client && t.details && t.details.id == m.authenticated){
+			if(t.details.id == m.authenticated && m.client != t.client){
 				notif('Your account was logged in from another device');
-				window.location = 'logout';
+				setTimeout(()=>{logout()},1500)
 			}
 		}
 		else if(m.ping){
@@ -190,6 +169,14 @@ class MqttCommunication{
 			log(m);
 		}
 	}
+
+
+
+
+
+
+
+
 
 
 
@@ -212,7 +199,57 @@ mqtt.send(global_topic,{disconnect:1})
 
 
 
+const IOT_ENDPOINT = "axc0ulezixlpw-ats.iot.ap-south-1.amazonaws.com";
+
+// example: us-east-1 
+const REGION = "ap-south-1";   
+
+// your AWS access key ID 
+const KEY_ID = "AKIA3EJXHCZTXXRJ7RZ7"; 
+
+// your AWS secret access key 
+const SECRET_KEY = "66qI2iaK+VJrYI+TmLQqA4i9lb1sTrV52f6WrVJP"; 
 
 
 
 
+
+
+
+function getEndpoint() { 
+
+
+	    // date & time 
+	    const dt = (new Date()).toISOString().replace(/[^0-9]/g, ""); 
+	    const ymd = dt.slice(0,8); 
+	    const fdt = `${ymd}T${dt.slice(8,14)}Z` 
+	    
+	    const scope = `${ymd}/${REGION}/iotdevicegateway/aws4_request`; 
+	    const ks = encodeURIComponent(`${KEY_ID}/${scope}`); 
+	    let qs = `X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=${ks}&X-Amz-Date=${fdt}&X-Amz-SignedHeaders=host`; 
+	    const req = `GET\n/mqtt\n${qs}\nhost:${IOT_ENDPOINT}\n\nhost\n${p4.sha256('')}`; 
+	    qs += '&X-Amz-Signature=' + p4.sign( 
+	        p4.getSignatureKey( SECRET_KEY, ymd, REGION, 'iotdevicegateway'), 
+	        `AWS4-HMAC-SHA256\n${fdt}\n${scope}\n${p4.sha256(req)}`
+	    ); 
+	    return `wss://${IOT_ENDPOINT}/mqtt?${qs}`; 
+	} 
+
+
+
+function p4(){} 
+p4.sign = function(key, msg) { 
+    const hash = CryptoJS.HmacSHA256(msg, key); 
+    return hash.toString(CryptoJS.enc.Hex); 
+}; 
+p4.sha256 = function(msg) { 
+    const hash = CryptoJS.SHA256(msg); 
+    return hash.toString(CryptoJS.enc.Hex); 
+}; 
+p4.getSignatureKey = function(key, dateStamp, regionName, serviceName) { 
+    const kDate = CryptoJS.HmacSHA256(dateStamp, 'AWS4' + key); 
+    const kRegion = CryptoJS.HmacSHA256(regionName, kDate); 
+    const kService = CryptoJS.HmacSHA256(serviceName, kRegion); 
+    const kSigning = CryptoJS.HmacSHA256('aws4_request', kService); 
+    return kSigning; 
+};

@@ -2,12 +2,12 @@
 require('db.php');
 $db = new DB();
 
-if(!isset($_COOKIE['ubm'])){
+if(!isset($_COOKIE['xtk'])){
 	cerror("Not authorised");
 }
 
-
-$user_id = json_decode(decode($_COOKIE['ubm']))[0];
+$user_id = decode($_COOKIE['xtk']);
+$user_id = explode(".",$user_id)[1];
 
 
 if(isset($_POST['create'])){
@@ -22,12 +22,12 @@ if(isset($_POST['create'])){
 
 
 	//check if account exists
-	$is_room_exists = $db->select('rooms','id,name,status',"name='$room_id'",1);
+	$is_room_exists = $db->select('bluffmaster_rooms','id,name,status',"name='$room_id'",1);
 	if($is_room_exists){
 		cerror("Room ID already exists",$db);
 	}
 
-	$room = $db->insert('rooms',array('user'=>$user_id,'name'=>$room_id));
+	$room = $db->insert('bluffmaster_rooms',array('user'=>$user_id,'name'=>$room_id));
 
 
 	res(array('mgs'=>'Room created',"item"=>array("id" => $room,'user'=>(int)$user_id,"name"=>$room_id)),$db);
@@ -42,10 +42,10 @@ else if(isset($_POST['join'])){
 
 
 	if(isset($_POST['room_id'])){
-		$room = $db->select('rooms','*',"id='".$db->escape($_POST['room_id'])."'",1);
+		$room = $db->select('bluffmaster_rooms','*',"id='".$db->escape($_POST['room_id'])."'",1);
 	}
 	else if(isset($_POST['room_name'])){
-		$room = $db->select('rooms','*',"name='".$db->escape($_POST['room_name'])."'",1);
+		$room = $db->select('bluffmaster_rooms','*',"name='".$db->escape($_POST['room_name'])."'",1);
 	}
 
 

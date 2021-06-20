@@ -2,12 +2,12 @@
 require('db.php');
 $db = new DB();
 
-if(!isset($_COOKIE['ubm'])){
+if(!isset($_COOKIE['xtk'])){
 	cerror("Not authorised");
 }
 
-
-$user_id = json_decode(decode($_COOKIE['ubm']))[0];
+$user_id = decode($_COOKIE['xtk']);
+$user_id = explode(".",$user_id)[1];
 
 
 if(isset($_POST['start'])){

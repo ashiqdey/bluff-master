@@ -24,13 +24,6 @@ class Waiting_hall{
 
 
 		
-
-		
-
-
-
-
-		
 		$(document).on('click','.reject_from_wh',function(){
 			wh.reject_from_waiting_hall($(this).attr('player-id'));
 		})
@@ -84,7 +77,12 @@ class Waiting_hall{
 
 
 		wh.accepted_members=[
-			{id:t.details.id,name:t.details.name,host:1}
+			{
+				id:t.details.id,
+				name:t.details.name,
+				dp:t.details.dp,
+				host:1
+			}
 		];
 		
 		
@@ -119,17 +117,25 @@ class Waiting_hall{
 
 
 
+		
 
-		//when someone will enter waiting hall, send a message
-		wh.i_am_waiting();
+	}
 
 
-		//boardcast a message to get all waiting members in waiting room
+
+	entered_room(){
+		/*
+		boardcast a message to get list of all waiting members in waiting room
+		*/
+
+	  	//wh.i_am_waiting();
+		
 		mqtt.send(mqtt.room_topic,{
 			waiting_hall : {are_you_waiting:t.active_room.id}
 		})
-
 	}
+
+
 
 
 
@@ -228,15 +234,16 @@ class Waiting_hall{
 
 		if(m.are_you_waiting){
 			//when someone will broadcast message {are_you_waiting:ROOM_ID} this function will be called
-			//check if i am in waiting hall, then send resposne
+			//check if i am in this waiting hall, then send resposne
 
 			if(t.active_room.id == m.are_you_waiting){
 				//yes i m waiting in room XYZ
-
 				wh.i_am_waiting();
 			}
 
 		}
+
+
 
 
 		//all members of this waiting room will broadcast this message
@@ -246,54 +253,44 @@ class Waiting_hall{
 			//if member doesnt exists in the array, then append to ui
 			if(wh.members_waiting.findIndex(e=>e.id==m.details.id) < 0){
 				wh.members_waiting.push(m.details);
-				
-				if(t.mw_timer){
-					clearTimeout(t.mw_time)
-				}
 
-				t.mw_timer = setTimeout(function(){
+				log("members_waiting added user_id:"+m.details.id);
+
+				$('#members_waiting').html(wh.members_waiting.map(make).join(''))
 
 
-					$('#members_waiting').html(wh.members_waiting.map(make).join(''))
+				function make(e){
+					let buttons;
 
-					
-
-					function make(e){
-						let buttons;
-
-						//this user is admin, show as host
-						if(e.id == t.active_room.user){
-							buttons =`<div class='f08 o6'>Host</div>`
-						}
-						else if(t.active_room.user==t.details.id){
-							if(wh.accepted_members.findIndex(f=>f.id==e.id) >-1){
-								buttons =`<div class='f08 o6'>Accepted</div>`
-							}
-							else{
-								buttons = `<button class="but mbut red w50 m210 reject_from_wh" room-id="${t.active_room.id}" player-id="${e.id}">Reject</button>
-								<button class="but mbut theme w50 ml10 accept_to_wh" room-id="${t.active_room.id}" player-id="${e.id}">Accept</button>`
-							}
+					//this user is admin, show as host
+					if(e.id == t.active_room.user){
+						buttons =`<div class='f08 o6'>Host</div>`
+					}
+					else if(t.active_room.user==t.details.id){
+						if(wh.accepted_members.findIndex(f=>f.id==e.id) >-1){
+							buttons =`<div class='f08 o6'>Accepted</div>`
 						}
 						else{
-							buttons = `<div class='f08 o6'>Waiting</div>`
+							buttons = `<button class="but mbut red w50 m210 reject_from_wh" room-id="${t.active_room.id}" player-id="${e.id}">Reject</button>
+							<button class="but mbut theme w50 ml10 accept_to_wh" room-id="${t.active_room.id}" player-id="${e.id}">Accept</button>`
 						}
-
-
-
-						//add the member in UI
-						return `<div class="p10 flex jcsb aic player" player-id="${e.id}">
-							<div class="flex aic w50">
-								<div class="ic40 greyd br50 bsc" style="background-image:url(img/dp/${e.id}.jpg)"></div>
-								<div class="f11 cgrey5 ml10 ttc">${e.name}</div>
-							</div>
-							<div class="w50 flex jcc btn_holder">
-								${buttons}
-							</div>
-						</div>`;
 					}
-					
-				},500);
+					else{
+						buttons = `<div class='f08 o6'>Waiting</div>`
+					}
 
+
+
+					//add the member in UI
+					return `<div class="p10 flex jcsb aic player" player-id="${e.id}">
+						<div class="flex aic w50">
+							<div class="ic40 greyd br50 bsc" style="background-image:url(${e.dp})"></div>
+							<div class="f11 cgrey5 ml10 ttc">${e.name}</div>
+						</div>
+						<div class="w50 flex jcc btn_holder">${buttons}</div>
+					</div>`;
+				}
+				
 
 			}
 		}
@@ -391,7 +388,16 @@ class Waiting_hall{
 		forward_hash('room');
 	}
 
+
+
+
+
 	i_am_waiting(){
+		/*
+		will  broadcast a message to all in this room that i am waiting  in this room
+		*/
+		log('I am waiting user_id:'+t.details.id);
+
 		mqtt.send(mqtt.room_topic,{
 			waiting_hall : {
 				waiting_in_room : t.active_room.id,

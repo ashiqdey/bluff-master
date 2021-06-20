@@ -279,20 +279,27 @@ class Game{
     if(t.rendered.includes('more'))return;
     t.rendered.push('more');
 
-    $('#more').html(`<div class="mask back mt"></div>
+    $('#more').html(`<div class="mask back mt usn></div>
     <div class="mask click_back sw"></div>
     <div class="darkbg wrap w100 mw400 mcen pa b0 l50 ttx-50 brt20 ofh">
       
       <div class="p20 flex jcsb aic whitebg">
         <div class="flex aic">
-          <a href='upload_dp' class="ic40 greyd br50 pr bs3opp bsc" style="background-image:url(img/dp/${t.details.id}.jpg)">
-            <div class="ix-edit ic20 pa ic br20 greyc f06 b0 r0 ic"></div>
-          </a>
+          <div class="ic40 greyd br50 pr bs3opp bsc" style="background-image:url(${t.details.dp})">
+          </div>
           <div class="f11 cgrey5 ml10">${t.details.name}</div>
         </div>
       </div>
   
       <div class="p10">
+
+
+        ${(getPWADisplayMode() == 'browser'?`<div class="add_to_home flex aic p10">
+                  <img src='img/logo/android-icon-48x48.png' class='ic30'>
+                  <div class="f11 cgrey5 ml10 cgrey9">Add to home screen</div>
+                </div>`:``)}
+        
+
         <div id="exit_room" class="flex aic p10">
           <div class="ic30 whitebg br50 ic f08 cgrey9 ix-exit_room"></div>
           <div class="f11 cgrey5 ml10 cgrey9">Exit room</div>
@@ -311,7 +318,19 @@ class Game{
     $(document).on('click','#logout',function(){
       g.logout();
     });
+    $(document).on('click','.add_to_home',function(){
+      install();
+    });
+
+
+    
   }
+
+
+
+
+
+
 
 
   
@@ -382,7 +401,6 @@ class Game{
   render_players(){
     log('render_players');
 
-
     /*
     render the playes on bottom bar
     */
@@ -398,21 +416,19 @@ class Game{
 
     g.players = player_divided;
 
-    log(g.players);
 
     $('#players .opponennt_players').html('');
 
-
     player_divided.map((e,i) => {
-      if(i==0){
-        $('#players .me').html(`<div class="ic50 greyd bs3f br30 pr player bsc" count='0' player-id='${e.id}' style="background-image:url(img/dp/${e.id}.jpg)"></div>`);
-      }
-      else{
-        $('#players .opponennt_players').append(`<div class="ic50 greyd bs3opp br30 mr20 pr player bsc" count='0' player-id='${e.id}' style="background-image:url(img/dp/${e.id}.jpg)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="ic50 pa t0 l0 rot-40"><circle fill="none" stroke="#1CEAA5" stroke-width="6" cx="50" cy="50" r="47"/></svg></div>`);
-      }
+        $(`#players ${i==0?'.me':'.opponennt_players'}`).html(user(e,(i==0?'bs3f':'bs3opp')));
     });
 
-    $('#players .opponennt_players').css({"width":(g.players*60)+'px'})
+    $('#players .opponennt_players').css({"width":(g.players*60)+'px'});
+
+
+    function user(e,c='bs3opp'){
+      return `<div class="ic50 greyd bs3opp br30 mr20 pr player bsc" count='0' player-id='${e.id}' style="background-image:url(${e.dp})"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="ic50 pa t0 l0 rot-40"><circle fill="none" stroke="#1CEAA5" stroke-width="6" cx="50" cy="50" r="47"/></svg></div>`;
+    }
   }
 
 
@@ -602,14 +618,14 @@ class Game{
       }
       
     }
-    else{
-      //show animation if player if my opponent
+
+
+      //show animation if player if my opponent or myself
       $(`#players .player[player-id='${player_id}']`).attr('active','1')
-    }
+    
 
 
 
-    log('----------end render-current-turn----------');
   }
 
 
@@ -914,7 +930,7 @@ class Game{
     g.render_lastet_card();
 
     //show user profile
-    $('#user_played').html(`<div class="dp ic50 b3sf br30 greyd bsc" style="background-image:url(img/dp/${player.id}.jpg)"></div><!--div class="name pa white cgrey7 br20 p5 lc1 f08 bold">${player.name}</div-->`);
+    $('#user_played').html(`<div class="dp ic50 b3sf br30 greyd bsc" style="background-image:url(${player.dp})"></div><!--div class="name pa white cgrey7 br20 p5 lc1 f08 bold">${player.name}</div-->`);
 
     //stop circle animation
     $(`#players .player[player-id='${m.pid}']`).attr('active','0')
@@ -1114,7 +1130,7 @@ class Game{
 
       return `<div class="p5 flex jcsb aic">
         <div class="flex aic w50">
-          <div class="ic35 greyd br50 bsc" style="background-image:url(img/dp/${player.id}.jpg)"></div>
+          <div class="ic35 greyd br50 bsc" style="background-image:url(${player.dp})"></div>
           <div class="lc1 cgrey5 ml10 w-50">${player.name}</div>
         </div>
         <div class="w50 flex">
@@ -1289,10 +1305,10 @@ class Game{
     $('#bluffed').attr('show','1').html(`<div class="pa t50 l0 w100 tty-50 tc">
       <img src="img/bluffed.webp" class="text w200p z2 pr">
       <div class="flex jcsb mcen w200p mt40">
-        <div class="bsc ic50 br50 greyd dp_anim pr" style="background-image:url(img/dp/${by.id}.jpg)" type='${(by.id==m.won ? 'win':'lose')}'>
+        <div class="bsc ic50 br50 greyd dp_anim pr" style="background-image:url(${by.dp}" type='${(by.id==m.won ? 'win':'lose')}'>
           <div class="pa b-40 tc l-50 w100p lc1">${by.name}</div>
         </div>
-        <div class="bsc ic50 br50 greyd dp_anim pr" style="background-image:url(img/dp/${to.id}.jpg)" type='${(to.id==m.won ? 'win':'lose')}'>
+        <div class="bsc ic50 br50 greyd dp_anim pr" style="background-image:url(${to.dp}" type='${(to.id==m.won ? 'win':'lose')}'>
           <div class="pa b-40 tc l-50 w100p lc1">${to.name}</div>
         </div>
       </div>

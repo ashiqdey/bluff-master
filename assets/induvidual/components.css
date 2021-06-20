@@ -165,7 +165,6 @@ input.show_placeholder::placeholder{color:var(--greya);}
   animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
   stroke-linecap:round;
   stroke-width:3px;fill:none;
-  stroke:var(--theme)
 }
 
 

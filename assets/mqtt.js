@@ -11,7 +11,7 @@ Mqtt Communication
 class MqttCommunication{
 	constructor(){
 
-        this.topic_base = `bm.xbl.com/bm/`;
+        this.topic_base = `base/gsmebluffmaster435435/`;
 		this.global_topic = 'global/1';
 		this.server_topic = 'SERVER/1';
 		

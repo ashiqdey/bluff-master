@@ -199,16 +199,16 @@ mqtt.send(global_topic,{disconnect:1})
 
 
 
-const IOT_ENDPOINT = "axc0ulezixlpw-ats.iot.ap-south-1.amazonaws.com";
+const IOT_ENDPOINT = "xxxx.ap-south-1.amazonaws.com";
 
 // example: us-east-1 
-const REGION = "ap-south-1";   
+const REGION = "ap-xx-1";   
 
 // your AWS access key ID 
-const KEY_ID = "AKIA3EJXHCZTXXRJ7RZ7"; 
+const KEY_ID = "xxxxx"; 
 
 // your AWS secret access key 
-const SECRET_KEY = "66qI2iaK+VJrYI+TmLQqA4i9lb1sTrV52f6WrVJP"; 
+const SECRET_KEY = "xxxxxxx"; 
 
 
 

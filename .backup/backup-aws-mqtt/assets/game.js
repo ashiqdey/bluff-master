@@ -281,7 +281,7 @@ class Game{
 
     $('#more').html(`<div class="mask back mt usn></div>
     <div class="mask click_back sw"></div>
-    <div class="darkbg wrap w100 mw450 mcen pa b0 l50 ttx-50 brt20 ofh">
+    <div class="darkbg wrap w100 mw400 mcen pa b0 l50 ttx-50 brt20 ofh">
       
       <div class="p20 flex jcsb aic whitebg">
         <div class="flex aic">
@@ -417,11 +417,10 @@ class Game{
     g.players = player_divided;
 
 
-    $('#players .me').html('');
     $('#players .opponennt_players').html('');
 
     player_divided.map((e,i) => {
-        $(`#players ${i==0?'.me':'.opponennt_players'}`).append(user(e,(i==0?'bs3f':'bs3opp')));
+        $(`#players ${i==0?'.me':'.opponennt_players'}`).html(user(e,(i==0?'bs3f':'bs3opp')));
     });
 
     $('#players .opponennt_players').css({"width":(g.players*60)+'px'});

@@ -1,0 +1,26 @@
+@font-face {
+    font-family: 'ix';
+    src: url('ix.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+[class*='ix-']:before{
+	display: inline-block;
+   font-family: 'ix';
+   font-style: normal;
+   font-weight: normal;
+   line-height: 1;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale
+}
+
+.ix-trophy:before{content:'\0041';}
+.ix-logout:before{content:'\0042';}
+.ix-mic:before{content:'\0043';}
+.ix-3dot:before{content:'\0044';}
+.ix-chat:before{content:'\0045';}
+.ix-edit:before{content:'\0046';}
+.ix-exit_room:before{content:'\0047';}
+.ix-send:before{content:'\0048';}
+.ix-cross:before{content:'\0049';}
+.ix-down:before{content:'\004a';}

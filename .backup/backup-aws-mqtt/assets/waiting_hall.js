@@ -155,7 +155,7 @@ class Waiting_hall{
 				return `<div class="p10 flex jcsb aic" player-id='${e.id}'>
 					<div class="flex aic w70">
 						<div class="ic40 greyd br50"></div>
-						<div class="f11 cgrey5 ml10 lc1 w-50">${e.name}</div>
+						<div class="f11 cgrey5 ml10">${e.name}</div>
 					</div>
 					<!--button class="but mbut trans cgreya w30">Invited</button-->
 					<button class="but mbut theme w30 invite" player-id='${e.id}'>Invite</button>
@@ -188,7 +188,7 @@ class Waiting_hall{
 	/*------------accept, reject----------------*/
 
 	reject_from_waiting_hall(player_id){
-		//player_id = parseInt(player_id);
+		player_id = parseInt(player_id);
 
 		//reject the member from waiting hall, change ui, send message, send mqtt, BY ADMIN
 		wh.player_rejected(player_id);
@@ -196,7 +196,7 @@ class Waiting_hall{
 	}
 
 	accept_to_waiting_hall(player_id){
-		//player_id = parseInt(player_id);
+		player_id = parseInt(player_id);
 
 		//accept the member to waiting hall, change UI, send mqtt, BY ADMIN
 		wh.player_accepted(player_id);
@@ -207,14 +207,10 @@ class Waiting_hall{
 	}
 
 	player_rejected(player_id){
-		log("---player_rejected "+player_id);
-
 		sfx.bluffed();
 		$(`.player[player-id='${player_id}']`).remove();
 	}
 	player_accepted(player_id){
-		log("---player_rejected "+player_id);
-
 		sfx.bluffed();
 		$(`.player[player-id='${player_id}'] .btn_holder`).html(`<div class='f08 o6'>Accepted</div>`);
 	}
@@ -289,7 +285,7 @@ class Waiting_hall{
 					return `<div class="p10 flex jcsb aic player" player-id="${e.id}">
 						<div class="flex aic w50">
 							<div class="ic40 greyd br50 bsc" style="background-image:url(${e.dp})"></div>
-							<div class="f11 cgrey5 ml10 ttc lc1 w-50">${e.name}</div>
+							<div class="f11 cgrey5 ml10 ttc">${e.name}</div>
 						</div>
 						<div class="w50 flex jcc btn_holder">${buttons}</div>
 					</div>`;
@@ -311,8 +307,7 @@ class Waiting_hall{
 
 		//if joining request is rejected by admin
 		else if(m.rejected){
-			log("Rejected == id "+m.rejected);
-
+			
 			//remove from array
 			wh.members_waiting = wh.members_waiting.filter(e=>e.id!=m.rejected);
 
@@ -321,18 +316,13 @@ class Waiting_hall{
 				wh.accepted_members = wh.accepted_members.filter(e=>e.id!=m.rejected)
 			}
 
-			//remove from ui, with sound
-			wh.player_rejected(m.rejected);
-
-
 			//if this is the targeted user then unsubscribe from room, take to room home
 			if(m.rejected == t.details.id){
-				log("Rejected == id");
 				wh.redirect_to_room(m.room_id)
 			}
 			//for rest other user just remove the player from ui
 			else{
-				log("Rejected NOT == id");
+				wh.player_rejected(m.rejected);
 			}
 			
 		}
@@ -396,8 +386,6 @@ class Waiting_hall{
 		mqtt.unsubscribe('ROOM/'+room_id);
 		delete t.active_room;
 		forward_hash('room');
-
-		room.render_room_ui();
 	}
 
 

@@ -97,10 +97,6 @@ function get_loggedin_data(r=0){
 
     //if account details is received then save in local
     if(r.data.id){
-
-      if(r.data.name){
-        r.data.name = r.data.name.split(" ")[0];
-      }
       save_ws('ud',r.data);
       user_data_found(r.data);
     }
@@ -179,12 +175,12 @@ function getRandom(mn, mx) {
 
 
 function loader(size='40px',stroke='var(--theme)'){
-  return `<div class="loader" style='width:${size};height:${size};'><div class="circular"><svg viewBox="25 25 50 50" class="w100"> <circle class="path" r='20' cx='50' cy='50' stroke='${stroke}'></circle> </svg></div></div>`
+	return `<div class="loader" style='width:${size};height:${size};'><div class="circular"><svg viewBox="25 25 50 50" class="w100"> <circle class="path" r='20' cx='50' cy='50' stroke='${stroke}'></circle> </svg></div></div>`
 }
 
 
 function processing(sel,val=1){
-  $(sel).attr('processing',val);
+	$(sel).attr('processing',val);
 }
 /*--------------------------ajax call----------------------------*/
 
@@ -346,14 +342,10 @@ function forward_hash(h){
 
 
 function on_hashchanged(new_hash,old_hash){
-  log("haschanged");
 
   //new_hash = new_hash.split('#')[1];
   old_hash = "#"+old_hash.split('#')[1];
   
-
-  log(old_hash);
-
   
   if(t.forward){
     delete t.forward;
@@ -362,19 +354,10 @@ function on_hashchanged(new_hash,old_hash){
   //back
   else if(old_hash != undefined){
 
-
     if(popup_hash.includes(old_hash)){
-      log("show 0 -> 1 "+old_hash);
-
       show(old_hash,0);
     }
-    else{
-      log("show 0 -> 2 "+old_hash);
-    }
     
-  }
-  else{
-    log("show 0 -> 3 "+old_hash);
   }
 
 }
